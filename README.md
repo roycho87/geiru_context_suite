@@ -2,7 +2,7 @@
 
 ComfyUI nodes for chaining MiniMax H3 clips without the quality slowly falling apart.
 
-> **New name.** This used to be the **Clown Context Suite**. ClownsharkBatwing's [RES4LYF](https://github.com/ClownsharkBatwing/RES4LYF) nodes are already called Clown-everything, and they're some of the most widely used nodes in ComfyUI, so to avoid mix-ups the suite is now named after the clown herself: **Geiru**. Only the names you see changed. The internal node names (`H3Clown...`) are the same, so workflows saved with the old names still load.
+> Formerly the **Clown Context Suite** (renamed to avoid mix-ups with ClownsharkBatwing's [RES4LYF](https://github.com/ClownsharkBatwing/RES4LYF) nodes). Old workflows still load.
 
 ## Credits
 
@@ -24,13 +24,13 @@ When you chain H3 clips, each new clip starts from the tail of the last one. You
 
 ## The fix: pull every shot back to clip 1
 
-**Geiru Context** pins the previous shot's tail to the front of each shot, so the motion carries over. **Geiru Keystone** locks clip 1's first frame into the start of every shot and tacks clip 1's capstone onto the back, and **Geiru Late Lock** brings the capstone in only for the last steps, so the shot picks its own pose first. Every shot is pulled back toward how clip 1 looked, so the loss can't stack up. With Geiru Context in front of Keystone the real frames are put back afterwards, so nothing from clip 1 ends up in the clips.
+Clip 1's first frame is the only frame from before any drift. **Geiru Keystone** and **Geiru Late Lock** pull every shot back toward it (details in [Geiru Keystone and Geiru Late Lock](#geiru-keystone-and-geiru-late-lock)), so the loss can't stack up, and nothing from clip 1 ends up in the saved clips.
 
 It's the simplest way to run a long chain: no language model and no extra renders. Start with the [Mad Clown Inventor example](#mad-clown-inventor-example).
 
 ## Degradation protection (one switch)
 
-Four nodes keep a long chain from drifting. Each keeps its own node and settings:
+Three nodes keep a long chain from drifting. Each keeps its own node and settings:
 
 | Node | What it does |
 |---|---|
@@ -49,10 +49,6 @@ Set them up once, then flip one switch: on for long stretches of one continuous 
 
 **With Geiru Anchoring:** Anchoring holds frames at the end of the shot, which is where the capstone would go. So when Anchoring is holding something, Keystone and Late Lock skip the capstone automatically (the keystone at the front is still used). Nothing to set.
 
-### Geiru Protection LoRA moved to an experimental repo
-
-Geiru Protection LoRA (a LoRA loader that only runs while protection is on, made for Imagineer13's [H3 Anti-Burn LoRA](https://huggingface.co/Imagineer13/H3-Anti-Burn-LoRA)) is now in its own repo: [Geiru-Protection-LoRa-Experimental](https://github.com/roycho87/Geiru-Protection-LoRa-Experimental). The early tests showed a colour improvement, but later tests weren't able to replicate it; the suspected cause is double compression of one of the initial test's side-by-side videos during stitching. I (roycho) tested the LoRA previously on its own, without these nodes, and it had a positive impact on colour; these tests just couldn't show any extra colour gain on top of degradation protection. They did show it doesn't hurt fine detail. Please try it and share what you find; more testing is needed. I plan to explore using a LoRA with this loader, on top of my protection nodes, to preserve colour better. The Clown in Imagination Land example moved there too.
-
 ### Your speed (turbo) LoRA matters
 
 Certain LoRAs affect degradation protection differently, because a LoRA changes how the model reacts to noise. The noise itself is the same (it comes from the scheduler), but each turbo was trained on its own noise levels, so it can handle the partly-noised held frames very differently.
@@ -61,34 +57,16 @@ All of my testing used `minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_resized_a
 
 ### Results
 
-On a walking scene, keystone + capstone + context noise held for 20 clips (about 2½ minutes) with no build-up; on a 50-clip chain through four scenes, it held where the plain chain fell apart (below). On a fully locked-off static shot the texture holds, but the colour can still slowly darken. Full numbers: [NerdNotes](https://github.com/roycho87/NerdNotes).
+On a 50-clip chain (about 5 minutes 20 seconds) through four scenes, rendered twice with the same seed: by clip 20 the plain chain had fallen apart, while with protection it stayed clean, though somewhat darker than clip 1. Scene changes reset the drift on their own, which is why protection is a switch. On a fully locked-off static shot the texture holds, but the colour can still slowly darken.
 
-## The 50-clip test
+![50-clip test, end of each section (protection on, top; plain chain, bottom)](https://raw.githubusercontent.com/roycho87/NerdNotes/main/20261101/media/beach_compare.png)
 
-One 50-clip chain (8-second clips, about 5 minutes 20 seconds stitched), rendered twice with the same prompts, seed and settings: once with degradation protection on, once as a plain chain. It runs through four scenes:
+Full numbers and how they were measured: [NerdNotes](https://github.com/roycho87/NerdNotes).
 
-| Clips | Scene | Protection |
-|---|---|---|
-| 1–20 | Running along a beach, camera tracking | Keystone + capstone from clip 1, context noise |
-| 21–22 | Slows down and sits at a beach café | Keystone off, context noise on |
-| 23–30 | Sitting at the café, still camera | Keystone + capstone from clip 22 |
-| 31–40 | Walking through a changing town | Keystone off, context noise on |
-| 41–42 | Sits down on a garden sofa | Keystone off, context noise on |
-| 43–50 | Sitting in the garden, still camera | Keystone + capstone from clip 42 |
+## Moved to experimental repos
 
-The end of each section (protection on, top; plain chain, bottom):
-
-![50-clip test, end of each section](https://raw.githubusercontent.com/roycho87/NerdNotes/main/20261101/media/beach_compare.png)
-
-- **Beach:** by clip 20 the plain chain has fallen apart (glitchy sky, burnt skin, the sand more than twice as gritty). With protection it's still clean, though about 12 levels darker than clip 1.
-- **Café and garden:** with protection there's barely any drift (the garden stays flat for 8 clips); the plain chain keeps getting darker.
-- **Scene changes reset the drift on their own,** which is why protection is a switch: on for long single-scene stretches, off around cuts.
-
-Full numbers, every clip of both chains, and how it was measured: [NerdNotes, section 10](https://github.com/roycho87/NerdNotes/blob/main/20261101/frame0_conclusions.md#10-beach-benchmark-a-50-clip-chain-through-four-scenes).
-
-## Geiru Prophecy has moved
-
-Geiru Prophecy (with Clown Carryover and the Prophecy example workflows) now lives in its own repo: [Geiru-Prophecy-Experimental-](https://github.com/roycho87/Geiru-Prophecy-Experimental-). It's too inconsistent and experimental to be considered a finished node. Keystone and Capstone are a much more promising direction.
+- **Geiru Protection LoRA** (a LoRA loader that only runs while protection is on, made for Imagineer13's [H3 Anti-Burn LoRA](https://huggingface.co/Imagineer13/H3-Anti-Burn-LoRA)): [Geiru-Protection-LoRa-Experimental](https://github.com/roycho87/Geiru-Protection-LoRa-Experimental). Testing so far shows no colour gain on top of degradation protection ([NerdNotes, test 16](https://github.com/roycho87/NerdNotes/blob/main/20261107/beach30_protection_combos.md)).
+- **Geiru Prophecy**, Clown Carryover and the Prophecy and Anchoring example workflows: [Geiru-Prophecy-Experimental-](https://github.com/roycho87/Geiru-Prophecy-Experimental-). Too inconsistent to be a finished node.
 
 ## Nodes
 
@@ -129,8 +107,6 @@ It works exactly like the original. Keep **Load Latent**, **Save Latent** and **
 | **Reset** | Sets Load 0 / Save 1. Doesn't delete anything. |
 | **Clear latents** | Deletes the numbered saved shots in the Load folder. Custom file names are kept. |
 
-On the first shot Geiru Context doesn't run the Load Latent node at all, so MultiRef's Load (which errors on an empty folder at `clip_index` 0) is fine.
-
 ### Using it with a Chain node
 
 Set the counter's `shot_counter` to **follow motion context**. The counter then copies the `clip_index` from the Motion Context **Save Latent** node every run, so the shot number lines up with the Chain node's count. The counter only reads that number and never changes it; the Chain node stays in charge. Leave Load and Save Latent's `clip_index` as widgets (not wired) so the Chain buttons can move them.
@@ -151,13 +127,7 @@ Both copy real latents into the shot at matching block positions and mask them s
 | **Geiru Context** | `head_frames` 39 | `drop_last` 17 |
 | **Geiru Anchoring** | `tail_frames` 56 | `drop_first` 17 |
 
-**Workflows that use Geiru Anchoring** (in [Geiru-Prophecy-Experimental-](https://github.com/roycho87/Geiru-Prophecy-Experimental-)):
-
-- [sane_person_example.json](https://github.com/roycho87/Geiru-Prophecy-Experimental-/blob/main/example_workflows/sane_person_example.json): Geiru Chain + Prophecy + Anchoring.
-- [sane_clown_example.json](https://github.com/roycho87/Geiru-Prophecy-Experimental-/blob/main/example_workflows/sane_clown_example.json): the same, with Clown Carryover.
-- [insane_example.json](https://github.com/roycho87/Geiru-Prophecy-Experimental-/blob/main/example_workflows/insane_example.json): the vlog, pre-split audio and one prompt file per shot.
-
-Two more are in this repo's `example_workflows` (moved over from my old packs and switched to Geiru Context and Geiru Anchoring, same settings):
+More Anchoring workflows are in [Geiru-Prophecy-Experimental-](https://github.com/roycho87/Geiru-Prophecy-Experimental-). Two are in this repo's `example_workflows` (moved over from my old packs and switched to Geiru Context and Geiru Anchoring, same settings):
 
 - [everyone_wants_a_piece_of_the_clown.json](example_workflows/everyone_wants_a_piece_of_the_clown.json): a Motion Context chain with Geiru Context (39, drop_first 17) and Geiru Anchoring (39, drop_last 17).
 - [withers_has_big_nattys.json](example_workflows/withers_has_big_nattys.json): the static vlog (odd shots fresh, even shots continue). On even shots, Geiru Context (39, drop_first 17) holds the end of the shot before at the start, and Geiru Anchoring (39, drop_last 17) holds the start of the shot after at the end. Motion Context's Load / Save Latent nodes are still used for the clips.
@@ -212,15 +182,15 @@ Putting the frame back and the back placement both need the model, so plug the m
 
 `slots` picks which: `capstone slot (back)` (default), `keystone slot (front)`, or both. It only touches what Keystone set up, so on shot 1 it does nothing. Late Lock also puts the real frame back, so you don't need the model through Keystone as well.
 
-**Setting `swap_step`:** the default is 4. It's recommended to set it to the last 25% of your steps (for example 6 on an 8-step run). The best point depends on your scheduler and sampler, since it's really the noise level that decides when Late Lock works best. Raise it if it starts to affect motion; lower it if colour or detail starts to go.
+**Setting `swap_step`:** the default is 4 (what the example workflows use). It's recommended to set it to the last 25% of your steps (for example 6 on an 8-step run). The best point depends on your scheduler and sampler, since it's really the noise level that decides when Late Lock works best. Raise it if it starts to affect motion; lower it if colour or detail starts to go.
 
 Comparison, clip 10 of the same 10-clip chain: no Keystone (base), keystone front, and keystone front + Late Lock capstone.
 
 https://github.com/user-attachments/assets/3002019d-7d6d-4afc-9592-09a3c201fb78
 
-In a 10-clip test (measured about 20 frames from the end of clip 10), colour drift from clip 1 went from 6.4 with no Keystone, to 3.9 with keystone front, to 2.9 with keystone front + Late Lock capstone. Over-sharpening dropped as well. (That test used the earlier version, which wrote the capstone into the shot's last single-frame slot instead of tacking it on.)
+In a 10-clip test (measured about 20 frames from the end of clip 10), colour drift from clip 1 went from 6.4 with no Keystone, to 3.9 with keystone front, to 2.9 with keystone front + Late Lock capstone. Over-sharpening dropped as well.
 
-**Joining:** with Geiru Context in front of Keystone and the model plugged through Keystone or Late Lock, nothing from clip 1 ends up in the saved clips, so join them the normal way (cut the last 39 frames of each clip). Without the model, or without Geiru Context, latent 0 stays clip 1's frame, so use the 17 + 22 cut instead (Seamless Video Combiner: **Use Beginning pair** on, Beginning Overlap 39, Beginning Join 22).
+**Joining:** see [Joining the clips](#joining-the-clips). With Geiru Context in front and the model plugged through Keystone or Late Lock, join the normal way; otherwise use the 17 + 22 cut.
 
 ## Geiru Hybrid Windows
 
@@ -233,7 +203,7 @@ Instead of chaining clips, it renders the whole video in one go, in overlapping 
 3. Windows 2, 3 and on render the first `switch_step` steps one after another. Each one's overlap with the window before is locked to that window's result. The keystone is locked into each window's first slot, and the capstone is tacked onto its back from `capstone_step` on (and cut off again).
 4. The last steps run as blended context windows over the whole video, which smooths the joins.
 
-With keystone and capstone off, it works like plain hybrid windows. In my test (a 60-second render, 17 windows, same seed), the plain version lost a lot of detail by the end and the keystone + capstone version held its detail much better.
+With keystone and capstone off, it works like plain hybrid windows.
 
 ### Experiment: 2 minutes in one render (16 windows)
 
@@ -251,11 +221,7 @@ By eye there's no visible degradation from start to end. It's one render with no
 
 ### Experiment: a talking clown at full steps (16 windows)
 
-
-
 https://github.com/user-attachments/assets/bd21d8b0-5c07-4d87-be8b-6c8ca5eeb197
-
-
 
 A 2 min 6 s talking video in one render. **Settings used for this video:**
 
@@ -284,7 +250,7 @@ The main settings are always on the node. The keystone, capstone, context noise,
 | `fuse_method` | How the blended steps average the windows (pyramid). |
 | `freenoise` | Reuses window 1's noise for every window: more consistent, but motion can repeat. Off gives more variety. On by default. |
 | `split_conds_to_windows` | Give each window its own prompt (see below). |
-| `crash_protection` | On by default. Saves the progress after every window to `output/geiru_hybrid_progress/crash_protection.pt` and clears unused GPU memory between windows. If ComfyUI crashes or runs out of memory, press Run again on the same run (same seed, prompts, size, length and settings) and it picks up from the last saved window. The file is deleted when the run finishes. It can't see a changed LoRA, turbo or sampler, so change the seed if you change those after a crash. To keep the finished latent, plug the sampler's output into Motion Context's (or MultiRef's) **Save Latent** node. ComfyUI's own Save Latent can't save H3's video + audio latent. |
+| `crash_protection` | On by default. Saves progress after every window (`output/geiru_hybrid_progress/`) and clears unused GPU memory between windows. After a crash or out-of-memory, press Run again with the same settings and it picks up from the last saved window. Change the seed if you changed a LoRA, turbo or sampler. To keep the finished latent, use Motion Context's (or MultiRef's) **Save Latent** (ComfyUI's own can't save H3's video + audio latent). |
 | `detail_latent` | Optional input: use this latent's first frame as the keystone instead of window 1's. |
 | **Advanced** | |
 | `keystone_swap` | Off by default. Window 1's finished first frame is locked into the first slot of every later window. |
@@ -328,7 +294,7 @@ Late Lock puts the real frame back, so join the clips the normal way (see [Joini
 
 ### Noisy Clown example
 
-`example_workflows/noisy_clown_example.json` is the Mad Clown Inventor workflow with **Geiru Context Noise** added, so you can try the full degradation protection set: Geiru Context → Geiru Context Noise → Geiru Keystone → Geiru Late Lock → sampler, with the model plugged through Context Noise and Late Lock. Context Noise is at 0.8 in this workflow; the node now defaults to 1, which tested best in the [fade and strength sweep](https://github.com/roycho87/NerdNotes/blob/main/20261101/frame0_conclusions.md) (set it to 1 here too if you like). Use it the same way as Mad Clown Inventor, and flip `degradation_protection` off around cuts and scene changes.
+`example_workflows/noisy_clown_example.json` is the Mad Clown Inventor workflow with **Geiru Context Noise** added, so you can try the full degradation protection set: Geiru Context → Geiru Context Noise → Geiru Keystone → Geiru Late Lock → sampler, with the model plugged through Context Noise and Late Lock. Context Noise is at 1, which tested best in the [fade and strength sweep](https://github.com/roycho87/NerdNotes/blob/main/20261101/frame0_conclusions.md). If the scene cuts, first try prompting more deliberately; turning the noise down to 0.8 is optional, but it may make degradation progress faster. Use it the same way as Mad Clown Inventor, and flip `degradation_protection` off around cuts and scene changes.
 
 ### Clown Coaster example
 
@@ -359,7 +325,6 @@ https://github.com/user-attachments/assets/840d5913-4df5-488a-ae09-3f3056f7e9b7
 - [ComfyUI-Custom-Scripts](https://github.com/pythongosssss/ComfyUI-Custom-Scripts)
 - [ComfyUI-Easy-Use](https://github.com/yolain/ComfyUI-Easy-Use)
 - [ComfyMath](https://github.com/evanspearman/ComfyMath)
-- LoadImageCrop, VideoResolutionNode, and the MiniMax low-VRAM nodes
 
 ## Install
 
