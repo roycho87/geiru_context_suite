@@ -1,4 +1,4 @@
-"""Geiru Hybrid Windows (was Clowntext Hybrid Windows).
+"""Geiru Hybrid Windows (was Clowntext Hybrid Windows). Geiru Window Director plugs in after it (optional).
 
 One long MiniMax H3 render in overlapping windows, done the HybridWindows way (JalenBrunson's ComfyUI-HybridWindows,
 from the Rolling Diffusion paper), on top of kijai's MiniMax H3 context windows in ComfyUI (PR #17425,
@@ -359,6 +359,9 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
 
         def cb(step, x0, x, total):
             guess["x0"] = x0
+            cap = getattr(h, "step_capture", None)        # Window Director's keep_late_steps
+            if cap is not None:
+                cap.append(x.detach().clone())
             if callback is not None:
                 callback(offset + step, x0, x, total_all)
         return cb
@@ -474,6 +477,22 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
             logging.info(f"[{WHO}] crash protection: progress saved after window {next_window} ({path})")
         except Exception as e:
             logging.warning(f"[{WHO}] crash protection: couldn't save progress: {e}")
+
+    director = (extra_args.get("model_options") or {}).get("geiru_window_director")
+    if director is not None:
+        from .window_director import run_directed
+        api = dict(windows=windows, shapes=shapes, sigmas=sigmas, steps=steps, k=k, h=h, handoff=handoff,
+                   detail=detail, dims=dims, per_window=per_window, clean_parts=clean_parts, base_parts=base_parts,
+                   pack=pack, unpack=unpack, run_win=run_win, one_window=one_window, keep=keep, counter=counter,
+                   extra_args=extra_args, executor=executor, guider=guider, progress=progress,
+                   disable_pbar=disable_pbar, nscale=nscale, ms=ms, latent_image=latent_image, noise=noise,
+                   ix=_ix, free_vram=_free_vram, pass_args=_pass_args, who=WHO, model=model)
+        state = dict(st=st, pins=pins, done=done)
+        try:
+            return run_directed(director, api, state)
+        finally:
+            h.capstone = None
+            h.only_window, h.window_subset, h.mask_conds = None, None, None
 
     try:
         for wi, idxs in enumerate(windows):

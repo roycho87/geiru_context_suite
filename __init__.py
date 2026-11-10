@@ -6,8 +6,10 @@ from .clown_keyframe import NODE_CLASS_MAPPINGS as _KEY_NODES, NODE_DISPLAY_NAME
 from .clown_context_noise import NODE_CLASS_MAPPINGS as _NOISE_NODES, NODE_DISPLAY_NAME_MAPPINGS as _NOISE_NAMES
 try:
     from .clown_hybrid_windows import NODE_CLASS_MAPPINGS as _HW_NODES, NODE_DISPLAY_NAME_MAPPINGS as _HW_NAMES
+    from .window_director import NODE_CLASS_MAPPINGS as _WD_NODES, NODE_DISPLAY_NAME_MAPPINGS as _WD_NAMES
+    _HW_NODES, _HW_NAMES = {**_HW_NODES, **_WD_NODES}, {**_HW_NAMES, **_WD_NAMES}
 except Exception as _e:  # an older ComfyUI (no MiniMax H3 context windows) shouldn't stop the rest of the pack loading
-    print(f"[Geiru Context Suite] Geiru Hybrid Windows not loaded (update ComfyUI): {_e}")
+    print(f"[Geiru Context Suite] Geiru Hybrid Windows / Window Director not loaded (update ComfyUI): {_e}")
     _HW_NODES, _HW_NAMES = {}, {}
 
 # Clown Chain stays an unchanged copy of nikodemon's Chain node; only its menu name and category are set here.

@@ -82,6 +82,7 @@ Everything shows up under the **Geiru Context Suite** category.
 | **Geiru Late Lock** | Picks the step Keystone's latents come in, so the shot picks its own pose first. |
 | **Geiru Context Noise** | ethanfel's context noise on the held frames. The real held latents are put back after sampling. |
 | **Geiru Hybrid Windows** | One long render (a minute or more) in overlapping windows instead of a chain of clips, with clip 1's keystone and capstone in every window. |
+| **Geiru Window Director** | Optional, goes after Geiru Hybrid Windows: build the render one window at a time, with Approve, Re-roll, Rewind and Blend all buttons. |
 
 ## Geiru Shot Counter
 
@@ -267,6 +268,50 @@ Workflows saved with the older layout still load with every value on the right s
 
 **One prompt per window:** make one prompt node per window, join them in order with ComfyUI's **Conditioning Combine** (chain them for more than two), plug the result into the guider, and turn `split_conds_to_windows` on. Each window takes the prompt for the part of the video under its middle, so with as many prompts as windows, window 1 gets prompt 1, window 2 prompt 2, and so on. One prompt for a whole minute makes every window try to do the whole thing, so the motion repeats.
 
+## Geiru Window Director
+
+An optional node for **Geiru Hybrid Windows** that lets you build the render **one window at a time**. A normal Hybrid Windows render makes every window in one go, so if window 4 comes out wrong you have to redo the whole video. With Window Director you check each window as it's made:
+
+1. Make window 1 and look at it.
+2. **Approve** it (the next window is made), or **Re-roll** it until it's right.
+3. Keep going. If you change your mind about an earlier window, click it in the strip and press **Rewind to selected** to redo it from there.
+4. When every window is made, **Blend all** runs the blended last steps over the whole video, which smooths the joins.
+
+Without Window Director plugged in, Geiru Hybrid Windows runs exactly as before.
+
+```
+model → Geiru Hybrid Windows → Geiru Window Director → guider / sampler → VAE decode → video
+```
+
+Each window's render returns only part of the video, so the decode doesn't spend time on the rest. The `preview` setting picks which part. After **Blend all**, it's the whole finished video.
+
+| Button | What it does |
+|---|---|
+| **Approve** | Keeps the window you're looking at and makes the next one. Its square turns green straight away. |
+| **Run/Re-roll** | Makes the current window again (fresh noise when `new_seed_on_reroll` is on). ComfyUI's own Run button does the same. |
+| **Rewind to selected** | Goes back to the window you clicked in the strip and makes it again. The windows after it are dropped. |
+| **Direct** | Approves on a loop until every window is made, or until you press Stop. Like Geiru Chain's Chain button. |
+| **Blend all** | Greyed out until every window is made. Runs the blended last steps over the whole video. With `bypass_blend` on it's **Join all**: the windows joined as approved, no blend. |
+| **Reset** | Clears this run's saved windows. Doesn't queue anything. |
+
+The strip at the bottom has one square per window: **green** = approved, **yellow** = ready to look at, **pulsing blue** = rendering, **dark** = not made yet. It fills in on the first run, once Hybrid Windows has worked out how many windows the video needs.
+
+| Setting | |
+|---|---|
+| `run_name` | Each name keeps its own windows in `output/geiru_window_director/<run_name>/`, so you can start a new take without losing the old one, and pick a run back up after restarting ComfyUI. |
+| `new_seed_on_reroll` | Off: a re-roll or rewind uses the same noise, so the window only changes if you change its prompt or the seed. On: fresh noise every time. |
+| `keep_late_steps` | Off by default. On (with `finished_handoff` on): every window also saves its steps after `switch_step`, so once every window is made you can raise `switch_step` on Geiru Hybrid Windows and **Blend all** starts from that later step (a lighter blend), without making the windows again. Uses more disk space. |
+| `bypass_blend` | Off by default. On: the last button becomes **Join all**, which joins the windows as you approved them and skips the blended steps. Use it with `finished_handoff` on. |
+| `preview` | **this window**: only the new window, with its overlap with the window before so you can see the join. Quickest. **all windows so far**: windows 1 to the current one, which takes longer to decode as it grows. |
+
+- Keep `finished_handoff` on in Geiru Hybrid Windows: each window then builds on the finished window you approved, and the preview shows those finished frames. With it off, each window builds on the softer half-finished guess at `switch_step`.
+- With `split_conds_to_windows` on, use one prompt per window. You can change a window's prompt and re-roll it.
+- **Nothing is ever cleared on its own.** If you change a setting a take depends on (length, size, steps, window length or overlap, keystone, capstone, finished handoff), the run stops with a message. Set it back, or press **Reset**. The one change that's allowed: raising `switch_step` once every window is made, with `keep_late_steps` on.
+- With `finished_handoff` on, each window is finished on its own, which costs the last few steps once more per window. Crash protection isn't used while Window Director is plugged in: every window is already saved.
+- If you installed **Geiru-Hybrid-Windows-Experimental** to try it early, remove it: this replaces it.
+
+Window Director's button layout follows Geiru Chain, whose buttons come from NikoDemon80's [ComfyUI-H3-Motion-Context](https://github.com/NikoDemon80/ComfyUI-H3-Motion-Context).
+
 ## Example workflows
 
 I'm a clown and I'm ridiculous. My workflow names are equally so. The names can be a bit confusing, so I made a different folder of exact copies of them with more intuitive names, called [Workflows with Boring Names](example_workflows/workflows_with_boring_names), which you can use if you want to... I guess...
@@ -280,6 +325,7 @@ I'm a clown and I'm ridiculous. My workflow names are equally so. The names can 
 | everyone_wants_a_piece_of_the_clown | `motion_context_chain_cntxt_and_anchors` |
 | withers_has_big_nattys | `static_vlog_odd_even_shots_cntxt_and_anchors` |
 | sane_clown_combiner | `join_clips_into_one_video` |
+| Clown Clontrol Freak | `hybrid_windows_window_director_3_windows` |
 
 ### Mad Clown Inventor example
 
@@ -314,6 +360,10 @@ Load your subject picture into Picture 1 and press ComfyUI's Run. The length and
 https://github.com/user-attachments/assets/840d5913-4df5-488a-ae09-3f3056f7e9b7
 
 `example_workflows/clowns_for_picard.json` is the Clown Coaster example as I actually rendered it: widescreen 1328 × 736 (0.98 MP), with more detailed, faster-moving prompts, and `sound_first` on as well. The 8 prompts are in big **WINDOW 1-8 PROMPT** text boxes in the green group at the bottom, in ride order, so you don't have to type into the small prompt nodes. Otherwise it's set up and used like Clown Coaster (same length, windows, settings and SAVE LATENT node). It's a big render (a full minute at almost 1 MP); lower the size if you run out of memory.
+
+### Clown Clontrol Freak example
+
+`example_workflows/clown_clontrol_freak.json` is a **Geiru Window Director** workflow: a 600-frame clip in 3 windows with one prompt per window, written in three H3 Prompt IDE nodes. The clown walks through a park, pets a duck at the pond, then falls back on the grass and the view cuts overhead. Load your subject picture into Picture 1, then use the Director's buttons (start with **Run/Re-roll**). The READ ME note in the workflow walks through it.
 
 ### Other packs the examples use
 
