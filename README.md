@@ -308,7 +308,6 @@ The strip at the bottom has one square per window: **green** = approved, **yello
 - With `split_conds_to_windows` on, use one prompt per window. You can change a window's prompt and re-roll it.
 - **Nothing is ever cleared on its own.** If you change a setting a take depends on (length, size, steps, window length or overlap, keystone, capstone, finished handoff), the run stops with a message. Set it back, or press **Reset**. The one change that's allowed: raising `switch_step` once every window is made, with `keep_late_steps` on.
 - With `finished_handoff` on, each window is finished on its own, which costs the last few steps once more per window. Crash protection isn't used while Window Director is plugged in: every window is already saved.
-- If you installed **Geiru-Hybrid-Windows-Experimental** to try it early, remove it: this replaces it.
 
 Window Director's button layout follows Geiru Chain, whose buttons come from NikoDemon80's [ComfyUI-H3-Motion-Context](https://github.com/NikoDemon80/ComfyUI-H3-Motion-Context).
 
