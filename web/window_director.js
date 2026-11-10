@@ -109,9 +109,20 @@ function paint(node) {
   fit(node);
 }
 
+// the height the buttons, status line and strip need. Measured from the pieces themselves, not from the
+// box around them: that box is stretched to the node's size, so measuring it made the node grow on every reload.
+// null while the page is still laying it out.
+function contentHeight(root) {
+  const kids = [...root.children];
+  if (!root.isConnected || !root.offsetWidth || !kids.length) return null;
+  const h = kids.reduce((a, k) => a + k.offsetHeight, 0);
+  return h ? h + 6 * (kids.length - 1) + 6 + 6 : null;   // gaps, padding, a little room
+}
+
 // keep the node at least as tall as its buttons and strip, so nothing spills out of it
 function fit(node) {
   requestAnimationFrame(() => {
+    if (contentHeight(node._gwd?.root ?? document.createElement("div")) == null) return;
     const min = node.computeSize?.();
     if (!min) return;
     if (node.size[1] < min[1] || node.size[0] < min[0]) {
@@ -259,10 +270,10 @@ app.registerExtension({
       swallow(root);
       const dom = this.addDOMWidget("window_director", "GEIRU_WINDOW_DIRECTOR", root, {
         serialize: false,
-        getMinHeight: () => root.scrollHeight + 6,
+        getMinHeight: () => contentHeight(root) ?? 150,
       });
-      dom.computeSize = (width) => [width, root.scrollHeight + 6];
-      this._gwd = { status: null, awaiting: false, directing: false, meta, strip, approve, reroll, rewind, direct, blend, reset };
+      dom.computeSize = (width) => [width, contentHeight(root) ?? 150];
+      this._gwd = { root, status: null, awaiting: false, directing: false, meta, strip, approve, reroll, rewind, direct, blend, reset };
       approve.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "approve"); };
       reroll.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "reroll"); };
       rewind.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "rewind"); };
@@ -318,6 +329,13 @@ app.registerExtension({
       hideWidget(W(this, "action"));
       hideWidget(W(this, "rewind_to_window"));
       if (this._gwd) { this._gwd.awaiting = false; refresh(this); }
+      // a node saved while it was growing: bring it back down to what it needs, once it's laid out
+      const shrink = (tries) => requestAnimationFrame(() => {
+        if (!this._gwd || contentHeight(this._gwd.root) == null) { if (tries > 0) shrink(tries - 1); return; }
+        const min = this.computeSize?.();
+        if (min && this.size[1] > min[1] + 40) { this.setSize([this.size[0], min[1]]); this.setDirtyCanvas?.(true, true); }
+      });
+      shrink(60);
       return r;
     };
   },
