@@ -325,6 +325,7 @@ I'm a clown and I'm ridiculous. My workflow names are equally so. The names can 
 | withers_has_big_nattys | `static_vlog_odd_even_shots_cntxt_and_anchors` |
 | sane_clown_combiner | `join_clips_into_one_video` |
 | Clown Control Freak | `hybrid_windows_window_director_3_windows` |
+| Clown Biker Babe | `hybrid_windows_window_director_8_windows` |
 
 ### Mad Clown Inventor example
 
@@ -363,6 +364,10 @@ https://github.com/user-attachments/assets/840d5913-4df5-488a-ae09-3f3056f7e9b7
 ### Clown Control Freak example
 
 `example_workflows/clown_control_freak.json` is a **Geiru Window Director** workflow: a 600-frame clip in 3 windows with one prompt per window, written in three H3 Prompt IDE nodes. The clown walks through a park, pets a duck at the pond, then falls back on the grass and the view cuts overhead. Load your subject picture into Picture 1, then use the Director's buttons (start with **Run/Re-roll**). The READ ME note in the workflow walks through it.
+
+### Clown Biker Babe example
+
+`example_workflows/clown_biker_babe.json` is a bigger **Geiru Window Director** workflow: a 60-second clip (1440 frames) in 8 windows with one prompt per window, written in eight H3 Prompt IDE nodes. The clown says her line and pulls on her helmet, then races at a ramp, flies off it, pops a wheelie, jumps a row of parked cars, rides a loop, goes off a cliff, and finally stops and pulls her helmet off. The sound is made by H3 from the prompts (no audio is loaded). Load your subject picture into Picture 1, then use the Director's buttons (start with **Run/Re-roll**). The READ ME note in the workflow walks through it.
 
 ### Other packs the examples use
 

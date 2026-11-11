@@ -1,0 +1,5407 @@
+{
+ "id": "6dfb170d-8e42-41f6-9668-b05bbe26140c",
+ "revision": 0,
+ "last_node_id": 3115,
+ "last_link_id": 275,
+ "nodes": [
+  {
+   "id": 401,
+   "type": "UNETLoader",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    420,
+    84
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "unet_name",
+     "name": "unet_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "unet_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "weight_dtype",
+     "name": "weight_dtype",
+     "type": "COMBO",
+     "widget": {
+      "name": "weight_dtype"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "UNETLoader",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "SDFlux\\minimax\\MiniMax-H3-Ref2VA-pruned_int8_convrot.safetensors",
+    "default"
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 398,
+   "type": "CLIPLoader",
+   "pos": [
+    0,
+    188
+   ],
+   "size": [
+    420,
+    108
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip_name",
+     "name": "clip_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "clip_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "type",
+     "name": "type",
+     "type": "COMBO",
+     "widget": {
+      "name": "type"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "device",
+     "name": "device",
+     "shape": 7,
+     "type": "COMBO",
+     "widget": {
+      "name": "device"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CLIP",
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      7,
+      79,
+      83,
+      219,
+      227,
+      235,
+      243,
+      251
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "CLIPLoader",
+    "models": [
+     {
+      "name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "directory": "text_encoders"
+     }
+    ],
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+    "minimax",
+    "default"
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 399,
+   "type": "VAELoader",
+   "pos": [
+    0,
+    400
+   ],
+   "size": [
+    420,
+    60
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "vae_name",
+     "name": "vae_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "vae_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "VAE",
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      8,
+      30,
+      80,
+      84,
+      220,
+      228,
+      236,
+      244,
+      252
+     ]
+    }
+   ],
+   "title": "H3 Video VAE",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "VAELoader",
+    "models": [
+     {
+      "name": "minimax_h3_video_vae_fp16.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+      "directory": "vae"
+     }
+    ],
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "minimax_h3_video_vae_int8_convrot.safetensors"
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 400,
+   "type": "VAELoader",
+   "pos": [
+    0,
+    564
+   ],
+   "size": [
+    420,
+    60
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "vae_name",
+     "name": "vae_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "vae_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "VAE",
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      9,
+      32,
+      81,
+      85,
+      221,
+      229,
+      237,
+      245,
+      253
+     ]
+    }
+   ],
+   "title": "H3 Audio VAE",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "VAELoader",
+    "models": [
+     {
+      "name": "minimax_h3_audio_vae_fp32.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors",
+      "directory": "vae"
+     }
+    ],
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "minimax_h3_audio_vae_fp32.safetensors"
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 2001,
+   "type": "MiniMaxChunkFeedForward",
+   "pos": [
+    520,
+    0
+   ],
+   "size": [
+    320,
+    82
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    },
+    {
+     "localized_name": "chunks",
+     "name": "chunks",
+     "type": "INT",
+     "widget": {
+      "name": "chunks"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "seq_threshold",
+     "name": "seq_threshold",
+     "type": "INT",
+     "widget": {
+      "name": "seq_threshold"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "links": [
+      2
+     ]
+    }
+   ],
+   "title": "VRAM saver: chunk feed-forward",
+   "properties": {
+    "cnr_id": "comfyui-kjnodes",
+    "ver": "1.5.0",
+    "Node name for S&R": "MiniMaxChunkFeedForward",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    4,
+    2048
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 2002,
+   "type": "MiniMaxLowVRAMAttention",
+   "pos": [
+    520,
+    186
+   ],
+   "size": [
+    320,
+    60
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    },
+    {
+     "localized_name": "head_chunks",
+     "name": "head_chunks",
+     "type": "INT",
+     "widget": {
+      "name": "head_chunks"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "links": [
+      3
+     ]
+    }
+   ],
+   "title": "VRAM saver: low VRAM attention",
+   "properties": {
+    "cnr_id": "comfyui-kjnodes",
+    "ver": "1.5.0",
+    "Node name for S&R": "MiniMaxLowVRAMAttention",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    4
+   ],
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 2003,
+   "type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+   "pos": [
+    520,
+    350
+   ],
+   "size": [
+    320,
+    40
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "links": [
+      4
+     ]
+    }
+   ],
+   "title": "Sage attention",
+   "properties": {
+    "cnr_id": "comfyui-kjnodes",
+    "ver": "1.5.0",
+    "Node name for S&R": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "color": "#332922",
+   "bgcolor": "#593930"
+  },
+  {
+   "id": 2004,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    520,
+    494
+   ],
+   "size": [
+    420,
+    82
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    },
+    {
+     "localized_name": "lora_name",
+     "name": "lora_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "lora_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "strength_model",
+     "name": "strength_model",
+     "type": "FLOAT",
+     "widget": {
+      "name": "strength_model"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      191
+     ]
+    }
+   ],
+   "title": "Turbo LoRA",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.41.0",
+    "Node name for S&R": "LoraLoaderModelOnly",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "minimaxloras\\turbo\\minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
+    1
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 5,
+   "type": "MiniMaxH3SigmaShift",
+   "pos": [
+    539.9283042491785,
+    1009.864023667274
+   ],
+   "size": [
+    282.4367968620411,
+    82
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 216
+    },
+    {
+     "localized_name": "shift_video",
+     "name": "shift_video",
+     "type": "FLOAT",
+     "widget": {
+      "name": "shift_video"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "shift_audio",
+     "name": "shift_audio",
+     "type": "FLOAT",
+     "widget": {
+      "name": "shift_audio"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      271,
+      272
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3SigmaShift",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    12,
+    3
+   ]
+  },
+  {
+   "id": 2010,
+   "type": "LoadImage",
+   "pos": [
+    0,
+    728
+   ],
+   "size": [
+    300,
+    340
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "COMBO",
+     "widget": {
+      "name": "image"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "choose file to upload",
+     "name": "upload",
+     "type": "IMAGEUPLOAD",
+     "widget": {
+      "name": "upload"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "IMAGE",
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      10,
+      45,
+      82,
+      86,
+      222,
+      230,
+      238,
+      246,
+      254
+     ]
+    },
+    {
+     "localized_name": "MASK",
+     "name": "MASK",
+     "type": "MASK",
+     "links": []
+    }
+   ],
+   "title": "Picture 1 (subject)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.41.0",
+    "Node name for S&R": "LoadImage",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "image (5).png",
+    "image"
+   ],
+   "color": "#233",
+   "bgcolor": "#355"
+  },
+  {
+   "id": 110,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    1040,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 7
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 8
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 9
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 10
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 186
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      143
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      275
+     ]
+    }
+   ],
+   "title": "PROMPT 1 / 8 (window 1) - its LATENT sets the length",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 1 of 8 of one continuous motorcycle stunt sequence, in one continuous shot with no cuts. <Subject 1> sits on <Subject 2> in <Subject 4>, says her line to the camera, slams <Subject 3> onto her head and tears off at full throttle.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] A low medium shot frames <Subject 1> sitting astride <Subject 2> at the start line of <Subject 4>, the engine idling and <Subject 3> resting on the fuel tank in front of her. The camera pushes in with small amplitude at slow speed toward her face. She looks straight into the camera with a cocky smirk, and <Subject 1> (S1), an adult woman with a bright, sassy voice speaking at a quick, punchy pace, says: <d>[English] All right, fuckers. Apparently, you can't pay attention unless you're watching something ridiculous. So here's what Hybrid Windows can do.</d> At 00:08.300, she grabs <Subject 3> and slams it down onto her head in one fast motion, snapping the dark visor shut, with her pink hair sticking out from under the back of the helmet. She twists the throttle hard, the rear tire spins and throws a huge rooster tail of dirt at the camera, and the camera whips around at fast speed to follow as she launches forward and tears away down the dirt track.\n\noverall_soundscape:\nThe engine idles with a deep rumble, then the hard clunk of the helmet going on and the snap of the visor. The engine screams up to a roar as the rear tire spits gravel and dirt.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1440,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 418,
+   "type": "RandomNoise",
+   "pos": [
+    3607.377361695449,
+    24.015799933197208
+   ],
+   "size": [
+    287.86850524707927,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "noise_seed",
+     "name": "noise_seed",
+     "type": "INT",
+     "widget": {
+      "name": "noise_seed"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "NOISE",
+     "name": "NOISE",
+     "type": "NOISE",
+     "links": [
+      24
+     ]
+    }
+   ],
+   "title": "Seed",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.34.0",
+    "Node name for S&R": "RandomNoise",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    1234,
+    "fixed"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 121,
+   "type": "BasicGuider",
+   "pos": [
+    3206.2017483764657,
+    9.382379218754455
+   ],
+   "size": [
+    270,
+    70
+   ],
+   "flags": {},
+   "order": 43,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 194
+    },
+    {
+     "localized_name": "conditioning",
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 257
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "GUIDER",
+     "name": "GUIDER",
+     "type": "GUIDER",
+     "links": [
+      25
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "BasicGuider",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 910,
+   "type": "KSamplerSelect",
+   "pos": [
+    3220,
+    360
+   ],
+   "size": [
+    300,
+    60
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "sampler_name",
+     "name": "sampler_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "sampler_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "SAMPLER",
+     "name": "SAMPLER",
+     "type": "SAMPLER",
+     "links": [
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.41.0",
+    "Node name for S&R": "KSamplerSelect",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "er_sde"
+   ]
+  },
+  {
+   "id": 123,
+   "type": "BasicScheduler",
+   "pos": [
+    3220,
+    524
+   ],
+   "size": [
+    270,
+    110
+   ],
+   "flags": {},
+   "order": 37,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 271
+    },
+    {
+     "localized_name": "scheduler",
+     "name": "scheduler",
+     "type": "COMBO",
+     "widget": {
+      "name": "scheduler"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "steps",
+     "name": "steps",
+     "type": "INT",
+     "widget": {
+      "name": "steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "denoise",
+     "name": "denoise",
+     "type": "FLOAT",
+     "widget": {
+      "name": "denoise"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "SIGMAS",
+     "name": "SIGMAS",
+     "type": "SIGMAS",
+     "links": [
+      27
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "BasicScheduler",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "beta",
+    8,
+    1
+   ]
+  },
+  {
+   "id": 124,
+   "type": "SamplerCustomAdvanced",
+   "pos": [
+    3763.4709222572797,
+    -774.227881056189
+   ],
+   "size": [
+    686.351045458975,
+    498.1950252549861
+   ],
+   "flags": {},
+   "order": 44,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "noise",
+     "name": "noise",
+     "type": "NOISE",
+     "link": 24
+    },
+    {
+     "localized_name": "guider",
+     "name": "guider",
+     "type": "GUIDER",
+     "link": 25
+    },
+    {
+     "localized_name": "sampler",
+     "name": "sampler",
+     "type": "SAMPLER",
+     "link": 26
+    },
+    {
+     "localized_name": "sigmas",
+     "name": "sigmas",
+     "type": "SIGMAS",
+     "link": 27
+    },
+    {
+     "localized_name": "latent_image",
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 275
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "output",
+     "name": "output",
+     "type": "LATENT",
+     "links": [
+      29,
+      31,
+      176
+     ]
+    },
+    {
+     "localized_name": "denoised_output",
+     "name": "denoised_output",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "Sampler",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "SamplerCustomAdvanced",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 130,
+   "type": "VAEDecode",
+   "pos": [
+    4523.9428559206635,
+    -225.53209162866395
+   ],
+   "size": [
+    240,
+    70
+   ],
+   "flags": {},
+   "order": 45,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "samples",
+     "name": "samples",
+     "type": "LATENT",
+     "link": 29
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 30
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "IMAGE",
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      74
+     ]
+    }
+   ],
+   "title": "Frames",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "VAEDecode",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 131,
+   "type": "VAEDecodeAudio",
+   "pos": [
+    4562.577960466563,
+    -79.12859487573355
+   ],
+   "size": [
+    240,
+    70
+   ],
+   "flags": {},
+   "order": 46,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "samples",
+     "name": "samples",
+     "type": "LATENT",
+     "link": 31
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "AUDIO",
+     "name": "AUDIO",
+     "type": "AUDIO",
+     "links": [
+      75
+     ]
+    }
+   ],
+   "title": "Audio",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "VAEDecodeAudio",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 133,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    4534.222222222221,
+    -884.8888888888223
+   ],
+   "size": [
+    420,
+    570
+   ],
+   "flags": {},
+   "order": 48,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 74
+    },
+    {
+     "localized_name": "audio",
+     "name": "audio",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": 75
+    },
+    {
+     "localized_name": "meta_batch",
+     "name": "meta_batch",
+     "shape": 7,
+     "type": "VHS_BatchManager",
+     "link": null
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": null
+    },
+    {
+     "localized_name": "frame_rate",
+     "name": "frame_rate",
+     "type": "FLOAT",
+     "widget": {
+      "name": "frame_rate"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "loop_count",
+     "name": "loop_count",
+     "type": "INT",
+     "widget": {
+      "name": "loop_count"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "format",
+     "name": "format",
+     "type": "COMBO",
+     "widget": {
+      "name": "format"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "pingpong",
+     "name": "pingpong",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "pingpong"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "save_output",
+     "name": "save_output",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "save_output"
+     },
+     "link": null
+    },
+    {
+     "name": "pix_fmt",
+     "type": [
+      "yuv420p",
+      "yuv420p10le"
+     ],
+     "widget": {
+      "name": "pix_fmt"
+     },
+     "link": null
+    },
+    {
+     "name": "crf",
+     "type": "INT",
+     "widget": {
+      "name": "crf"
+     },
+     "link": null
+    },
+    {
+     "name": "save_metadata",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "save_metadata"
+     },
+     "link": null
+    },
+    {
+     "name": "trim_to_audio",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "trim_to_audio"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "Filenames",
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": []
+    }
+   ],
+   "title": "SAVE THE VIDEO",
+   "properties": {
+    "cnr_id": "comfyui-videohelpersuite",
+    "ver": "1.7.7",
+    "Node name for S&R": "VHS_VideoCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": {
+    "frame_rate": 24,
+    "loop_count": 0,
+    "filename_prefix": "clown_biker_babe/clip",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 16,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   }
+  },
+  {
+   "id": 1004,
+   "type": "Note",
+   "pos": [
+    -93.03471616421427,
+    -760.8030799164003
+   ],
+   "size": [
+    560,
+    620
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "title": "READ ME",
+   "properties": {
+    "Node name for S&R": "Note",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "GEIRU WINDOW DIRECTOR - CLOWN BIKER BABE (8 windows, 60 seconds)\n\nGeiru, the clown, says her line and pulls on her helmet (window 1), races at a ramp (2), flies off it in a slow-motion superman (3), rides standing on the pegs and pops a wheelie (4), jumps a row of parked cars (5), rides the loop (6), goes off a cliff and skids (7), then stops, unzips a little and pulls her helmet off in slow motion (8).\n\nHOW TO USE\n1. Load your character picture in \"Picture 1 (subject)\".\n2. Write each window's prompt in its H3 Prompt IDE node (Window 1-8). They feed the eight PROMPT nodes.\n3. On Geiru Window Director, press Run/Re-roll to make window 1. Use the node's buttons, not ComfyUI's Run button.\n4. Look at it. Approve keeps it and makes the next window. Run/Re-roll makes it again (change its prompt or the seed first, or turn on new_seed_on_reroll).\n5. Changed your mind about an earlier window? Click it in the strip, then Rewind to selected.\n6. When all 8 windows are made, press Blend all: it runs the blended last steps over the whole video, which smooths the joins. Want the windows joined exactly as you approved them instead? Turn on bypass_blend and the button becomes Join all.\n\nSETTINGS THAT MATTER\n- One prompt per window: 8 prompts, PROMPT 1 length about 60 s, Hybrid Windows context_length 226 / overlap 39 = 8 windows. With split_conds_to_windows on, the prompts are spread evenly over the video, so the number of prompts should match the number of windows.\n- finished_handoff is ON in Geiru Hybrid Windows: each window builds on the finished window you approved. Keep it on with the Director.\n- run_name keeps each take in output/geiru_window_director/<run_name>. A new name = a new take. Reset clears a take.\n- Nothing resets on its own: if you change the length, size, steps or window settings, the run stops with a message. Set them back, or press Reset.\n- The sound is made by H3 from the prompts (no audio is loaded)."
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 2030,
+   "type": "H3PromptReferenceInputs",
+   "pos": [
+    1040,
+    0
+   ],
+   "size": [
+    320,
+    146
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "label": "<Picture 1>",
+     "localized_name": "<Picture 1>",
+     "name": "pictures.<Picture 1>",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 45
+    },
+    {
+     "label": "<Picture 2>",
+     "localized_name": "<Picture 2>",
+     "name": "pictures.<Picture 2>",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "<Video 1>",
+     "localized_name": "<Video 1>",
+     "name": "videos.<Video 1>",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "<Audio 1>",
+     "localized_name": "<Audio 1>",
+     "name": "audios.<Audio 1>",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "<Picture 3>",
+     "name": "pictures.<Picture 3>",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "<Audio 2>",
+     "name": "audios.<Audio 2>",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "label": "references",
+     "localized_name": "references",
+     "name": "references",
+     "type": "H3_PROMPT_REFERENCES",
+     "links": [
+      185,
+      187,
+      189,
+      217,
+      225,
+      233,
+      241,
+      249
+     ]
+    }
+   ],
+   "title": "H3 Prompt IDE - references",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptReferenceInputs",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3017,
+   "type": "Note",
+   "pos": [
+    510.6034357421512,
+    -747.1516821103515
+   ],
+   "size": [
+    560,
+    520
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "title": "DOWNLOAD LINKS - where to get every node",
+   "properties": {
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "WHERE TO GET THE NODES IN THIS WORKFLOW\n\nGeiru Hybrid Windows + Geiru Window Director (Geiru Context Suite):\nhttps://github.com/roycho87/geiru_context_suite\nNeeds ComfyUI updated to a version with MiniMax H3 context windows (PR #17425).\n\nH3 Prompt IDE (the eight window prompt nodes):\nhttps://github.com/ethanfel/ComfyUI-H3-Prompt-IDE\n\nSave Latent (the SAVE LATENT node) - install ONE of these, not both (they use the same node names). Optional: delete the node if you don't want the latent saved.\n  H3 Motion Context: https://github.com/NikoDemon80/ComfyUI-H3-Motion-Context\n  H3 Motion Context MultiRef: https://github.com/seitanism/ComfyUI-H3-Motion-Context-MultiRef\n\nKJNodes (the VRAM saver and Sage attention nodes, optional - bypass them if you don't have them):\nhttps://github.com/kijai/ComfyUI-KJNodes\n\nVideoHelperSuite (Video Combine):\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite\n\nEverything else is built into ComfyUI. Update ComfyUI if the MiniMax H3 nodes are missing.\n"
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 3031,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    1770.0350920898443,
+    1670.245644628911
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 79
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 80
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 81
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 82
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 188
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      144
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 2 / 8 (window 2)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 2 of 8, continuing straight on from part 1, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, races <Subject 2> flat out across <Subject 4>, hits a huge dirt ramp and launches high into the air.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3>, already racing <Subject 2> flat out down the dirt track of <Subject 4>. A low tracking shot races alongside her at ground level at fast speed, the knobby tires inches from the lens and dirt pelting the camera. She leans hard into a sliding turn, the rear wheel kicking out and spraying a wall of dirt, then straightens up and charges straight at a huge dirt ramp. The camera swings around behind her at fast speed as she hits the lip of the ramp and launches high into the air, the bike rising against the blue sky. The camera pedestals up with large amplitude at fast speed to rise with her, and by the end of the shot she is soaring high above the desert, still climbing.\n\noverall_soundscape:\nThe engine screams at full revs, the tires roar over the dirt, and clods of dirt and gravel spray and patter everywhere. The engine note jumps higher as the wheels leave the ramp, then wind rushes past.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3032,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    2480,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 83
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 84
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 85
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 86
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 190
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      146
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 3 / 8 (window 3)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 3 of 8, continuing straight on from part 2, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, does a full backflip on <Subject 2> high in the air over <Subject 4>, then slams down in a huge cloud of dust and keeps riding.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3>, high in the air on <Subject 2> above <Subject 4>, right where part 2 ended. She pulls back on the handlebars and the bike rotates into a full backflip, her body tucked tight to the seat. The camera arcs around her with large amplitude at fast speed in mid-air as she flips upside down against the blue sky and comes back around. The bike drops toward the ground and she slams down onto the dirt landing in a massive explosion of dust, the suspension compressing all the way. The camera whips round at fast speed and chases her as she bursts out of the dust cloud without slowing down, standing up on the pegs and gunning it.\n\noverall_soundscape:\nWind rushes past in mid-air with the engine revving, then a huge thud as the bike lands and the suspension bottoms out. Dust and gravel blast outward, and the engine roars back up to full revs.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3047,
+   "type": "ConditioningCombine",
+   "pos": [
+    3140.341244444481,
+    1600.2963155555572
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 30,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 143
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 144
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      145
+     ]
+    }
+   ],
+   "title": "Combine 1-2",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3048,
+   "type": "ConditioningCombine",
+   "pos": [
+    3287.2938622222514,
+    1815.9776711111074
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 32,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 145
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 146
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      223
+     ]
+    }
+   ],
+   "title": "Combine 1-3",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3063,
+   "type": "MiniMaxH3MotionContextSaveLatent",
+   "pos": [
+    4057.9266338657344,
+    310.73366134265393
+   ],
+   "size": [
+    320,
+    90
+   ],
+   "flags": {},
+   "order": 47,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "latent",
+     "name": "latent",
+     "type": "LATENT",
+     "link": 176
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "clip_index",
+     "name": "clip_index",
+     "type": "INT",
+     "widget": {
+      "name": "clip_index"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "latent_path",
+     "name": "latent_path",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "title": "SAVE LATENT (hybrid windows)",
+   "properties": {
+    "cnr_id": "comfyui-h3-motion-context",
+    "ver": "5335715abe54c1a9bfbe3494da29aae3e8635ce3",
+    "Node name for S&R": "MiniMaxH3MotionContextSaveLatent",
+    "aux_id": "NikoDemon80/ComfyUI-H3-Motion-Context",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "filename_prefix": true,
+      "clip_index": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "latents/geiru_window_director/clown_biker_babe",
+    0
+   ]
+  },
+  {
+   "id": 3066,
+   "type": "H3ClownHybridWindows",
+   "pos": [
+    1622.0122284011757,
+    -373.64760144081566
+   ],
+   "size": [
+    630.9721527260343,
+    438
+   ],
+   "flags": {},
+   "order": 38,
+   "mode": 0,
+   "showAdvanced": true,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 272
+    },
+    {
+     "localized_name": "detail_latent",
+     "name": "detail_latent",
+     "shape": 7,
+     "type": "LATENT",
+     "link": null
+    },
+    {
+     "localized_name": "context_length",
+     "name": "context_length",
+     "type": "INT",
+     "widget": {
+      "name": "context_length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "context_overlap",
+     "name": "context_overlap",
+     "type": "INT",
+     "widget": {
+      "name": "context_overlap"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "switch_step",
+     "name": "switch_step",
+     "type": "INT",
+     "widget": {
+      "name": "switch_step"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "fuse_method",
+     "name": "fuse_method",
+     "type": "COMBO",
+     "widget": {
+      "name": "fuse_method"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "freenoise",
+     "name": "freenoise",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "freenoise"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "split_conds_to_windows",
+     "name": "split_conds_to_windows",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "split_conds_to_windows"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "crash_protection",
+     "name": "crash_protection",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "crash_protection"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "keystone_swap",
+     "name": "keystone_swap",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "keystone_swap"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "keystone_step",
+     "name": "keystone_step",
+     "shape": 7,
+     "type": "INT",
+     "widget": {
+      "name": "keystone_step"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "back_capstone",
+     "name": "back_capstone",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "back_capstone"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "capstone_step",
+     "name": "capstone_step",
+     "shape": 7,
+     "type": "INT",
+     "widget": {
+      "name": "capstone_step"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "context_noise",
+     "name": "context_noise",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "context_noise"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "context_noise_strength",
+     "name": "context_noise_strength",
+     "shape": 7,
+     "type": "FLOAT",
+     "widget": {
+      "name": "context_noise_strength"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "context_noise_fade",
+     "name": "context_noise_fade",
+     "shape": 7,
+     "type": "COMBO",
+     "widget": {
+      "name": "context_noise_fade"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sound_first",
+     "name": "sound_first",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "sound_first"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "finished_handoff",
+     "name": "finished_handoff",
+     "shape": 7,
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "finished_handoff"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "links": [
+      195
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "H3ClownHybridWindows",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "input_ue_unconnectable": {},
+     "version": "7.8"
+    }
+   },
+   "widgets_values": [
+    226,
+    39,
+    6,
+    "pyramid",
+    false,
+    true,
+    true,
+    true,
+    0,
+    true,
+    4,
+    true,
+    1,
+    "linear",
+    false,
+    true
+   ],
+   "color": "#c2407a",
+   "bgcolor": "#6e2347"
+  },
+  {
+   "id": 3067,
+   "type": "GeiruWindowDirector",
+   "pos": [
+    2352.6736703329702,
+    -540.3145935456199
+   ],
+   "size": [
+    658.0990880634499,
+    310
+   ],
+   "flags": {},
+   "order": 40,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 195
+    },
+    {
+     "localized_name": "run_name",
+     "name": "run_name",
+     "type": "STRING",
+     "widget": {
+      "name": "run_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "rewind_to_window",
+     "name": "rewind_to_window",
+     "type": "INT",
+     "widget": {
+      "name": "rewind_to_window"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "new_seed_on_reroll",
+     "name": "new_seed_on_reroll",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "new_seed_on_reroll"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "keep_late_steps",
+     "name": "keep_late_steps",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "keep_late_steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "bypass_blend",
+     "name": "bypass_blend",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "bypass_blend"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "preview",
+     "name": "preview",
+     "type": "COMBO",
+     "widget": {
+      "name": "preview"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "action",
+     "name": "action",
+     "type": "COMBO",
+     "widget": {
+      "name": "action"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "links": [
+      194
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GeiruWindowDirector",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "input_ue_unconnectable": {},
+     "version": "7.8"
+    }
+   },
+   "widgets_values": [
+    "biker_babe",
+    1,
+    false,
+    true,
+    false,
+    "this window",
+    "reroll",
+    ""
+   ],
+   "color": "#c2407a",
+   "bgcolor": "#6e2347"
+  },
+  {
+   "id": 3068,
+   "type": "H3PromptIDE",
+   "pos": [
+    1040,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 185
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      186
+     ]
+    }
+   ],
+   "title": "Window 1 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 1 of 8 of one continuous motorcycle stunt sequence, in one continuous shot with no cuts. <Subject 1> sits on <Subject 2> facing the camera in <Subject 4>, smiling sweetly and cutely as she lifts <Subject 3> up in both hands and says her line, then pulls it on at the last second and accelerates directly toward the camera, dust kicking up behind her.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with fast camera moves.\r\n\r\n[Shot 1] A low medium shot frames <Subject 1> from the front, sitting astride <Subject 2> at the start line of <Subject 4>, facing straight toward the camera, the engine idling. The camera pushes in with small amplitude at slow speed toward her face. As she starts speaking she picks up <Subject 3> from the fuel tank and slowly lifts it up in both hands, holding it raised above her head while she talks, her face still fully visible beneath it. She looks straight into the camera with a big, sweet, cute smile, her eyes bright and happy, her eyebrows relaxed and soft, her whole face warm and playful, never frowning or scowling. <Subject 1> (S1), an adult woman with a bright, cheerful, sweet voice speaking at a quick, bubbly pace, says with a giggly smile: <d>[English] All right, fuckers. Apparently, you can't pay attention unless you're watching something ridiculous. So here's what Hybrid Windows can do.</d> At 00:08.300, right as she finishes the line, she gives a cute little smile, pulls <Subject 3> down onto her head in one fast motion and snaps the dark visor shut, her pink hair sticking out from under the back of the helmet. Immediately she twists the throttle and accelerates directly toward the camera, the rear tire spinning and throwing a huge cloud of dust and a rooster tail of dirt up behind her. The camera trucks backward at fast speed, staying in front of her the whole time, so she keeps charging straight at the lens, and by the end of the shot she is racing head-on toward the camera with the dust cloud billowing behind her.\r\n\r\noverall_soundscape:\r\nThe engine idles with a deep rumble, then the hard clunk of the helmet going on and the snap of the visor. The engine screams up to a roar as she accelerates and the rear tire spits gravel and dirt.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3069,
+   "type": "H3PromptIDE",
+   "pos": [
+    1760,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 187
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      188
+     ]
+    }
+   ],
+   "title": "Window 2 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 2 of 8, continuing straight on from part 1, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, races <Subject 2> head-on toward the camera across <Subject 4>, the camera arcs all the way around her as she speeds toward a huge dirt ramp, and the shot ends at the exact moment she leaves the top of the ramp.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with fast camera moves.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3>, already racing <Subject 2> head-on toward the camera down the dirt track of <Subject 4> at very high speed, a huge cloud of dust billowing behind her, exactly as at the end of part 1. The camera trucks backward at fast speed in front of her, then arcs around her with large amplitude at fast speed while moving with her, sweeping from her front, past her side, all the way around to behind her, keeping <Subject 1> centered in frame the whole time as she keeps riding straight ahead, never turning. A huge dirt ramp rises directly ahead of her. She crouches low over the handlebars, twists the throttle wide open and accelerates even harder, the bike rocketing up the face of the ramp. The camera follows close behind her at fast speed, and the shot ends at the exact moment her wheels leave the top lip of the ramp and the bike launches into the air against the blue sky.\r\n\r\noverall_soundscape:\r\nThe engine screams at maximum revs, wind roars past, and the tires thunder over the dirt, with gravel spraying behind her. The engine hits its highest scream as she blasts up the ramp.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3070,
+   "type": "H3PromptIDE",
+   "pos": [
+    2480,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 189
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      190
+     ]
+    }
+   ],
+   "title": "Window 3 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 3 of 8, continuing straight on from part 2, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, flies high through the air on <Subject 2> above <Subject 4> and does a superman trick in dramatic slow motion, stretching her body out flat behind the bike, then time snaps back to full speed as she pulls back onto the seat, lands hard in a big burst of dirt and keeps riding.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts, fast-paced, with a dramatic slow-motion moment in the middle.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3>, high in the air on <Subject 2> above <Subject 4>, seen from behind, right where part 2 ended. The bike stays upright and level the whole time, never flipping or rotating. Time slows into dramatic slow motion: holding the handlebars tightly with both hands, she slowly kicks her legs off the bike and stretches her whole body out straight and flat behind it, flying horizontally through the clear air like a superhero, her pink hair streaming out from under the helmet. In slow motion, the camera trucks right with large amplitude, gliding around to her side to show her stretched out in full profile against the blue sky. She pulls her legs back in and drops back onto the seat, and time snaps back to full speed as the bike falls toward the ground. She lands hard on the dirt, the suspension compressing, and the tires slam into the ground and kick up a huge burst of dirt and dust all around the bike. The camera chases her from behind at fast speed as she rides on out of the dust cloud without slowing down.\r\n\r\noverall_soundscape:\r\nWind rushes past in mid-air, then the sound slows and deepens into a low, stretched whoosh during the slow motion. The sound snaps back to normal with a heavy thud as the bike lands, dirt and gravel blast outward, and the engine roars back up to full revs.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3071,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    510.48643706014235,
+    664.8692907412334
+   ],
+   "size": [
+    420,
+    82
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 191
+    },
+    {
+     "localized_name": "lora_name",
+     "name": "lora_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "lora_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "strength_model",
+     "name": "strength_model",
+     "type": "FLOAT",
+     "widget": {
+      "name": "strength_model"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      215
+     ]
+    }
+   ],
+   "title": "Turbo LoRA",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.41.0",
+    "Node name for S&R": "LoraLoaderModelOnly",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "minimaxloras\\MiniMax3_Boob Physics_v1.safetensors",
+    1
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 3096,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    508.6323341369513,
+    825.8001322438325
+   ],
+   "size": [
+    420,
+    82
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 215
+    },
+    {
+     "localized_name": "lora_name",
+     "name": "lora_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "lora_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "strength_model",
+     "name": "strength_model",
+     "type": "FLOAT",
+     "widget": {
+      "name": "strength_model"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      216
+     ]
+    }
+   ],
+   "title": "Turbo LoRA",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.41.0",
+    "Node name for S&R": "LoraLoaderModelOnly",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "minimaxloras\\H3_Motion_BoosterV2.safetensors",
+    1
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 3097,
+   "type": "H3PromptIDE",
+   "pos": [
+    3200,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 217
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      218
+     ]
+    }
+   ],
+   "title": "Window 4 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 4 of 8, continuing straight on from part 3, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3> and her zipped-up suit, rides <Subject 2> standing up on the pegs with her butt sticking out, then pops a long wheelie across <Subject 4> with one leg stuck out to the side, before racing toward a launch ramp.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit zipped up to the collar, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts, fast-paced, with fast camera moves.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> and her pink leather suit zipped all the way up to the collar, riding <Subject 2> fast across <Subject 4>. A low tracking shot follows close behind her at fast speed as she rides standing up on the pegs, knees bent, leaning forward over the handlebars with her butt sticking out high in the air, the bike bucking over a stretch of bumpy dirt whoops and dirt flying off the rear tire. The camera trucks right with large amplitude at fast speed and swings around to her side as she drops back down onto the seat. She pulls back on the handlebars and pops the front wheel high into the air, riding a long wheelie across the flat dirt on the back wheel alone, and playfully sticks one leg straight out to the side as she rolls along. The camera races alongside her in profile at fast speed. She brings the front wheel back down, tucks her leg back onto the peg and accelerates hard toward a launch ramp in the distance, the camera racing alongside her.\r\n\r\noverall_soundscape:\r\nThe engine roars and the suspension rattles and thuds over the bumps, with dirt spraying off the rear tire. The engine revs high and steady through the wheelie, then thunders as she accelerates toward the ramp.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3098,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    3200,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 219
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 220
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 221
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 222
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 218
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      224
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 4 / 8 (window 4)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 4 of 8, continuing straight on from part 3, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, rides <Subject 2> standing up on the pegs with her butt sticking out, then sits down and unzips her suit halfway while riding one-handed through <Subject 4>.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3>, riding <Subject 2> fast across <Subject 4>. A low tracking shot follows close behind her at fast speed as she rides standing up on the pegs, knees bent, leaning forward over the handlebars with her butt sticking out high in the air, the bike bucking over a stretch of bumpy dirt whoops and dirt flying off the rear tire. The camera trucks right with large amplitude at fast speed and swings around to her side as she drops back down onto the seat. Riding one-handed at speed, she grabs the silver zipper at her collar and pulls it down to the middle of her chest, revealing her cleavage, the pink leather flapping open in the wind. She grips the handlebars with both hands again and accelerates hard toward a launch ramp in the distance, the camera racing alongside her.\n\noverall_soundscape:\nThe engine roars and the suspension rattles and thuds over the bumps, with dirt spraying off the rear tire. The zipper gives a quick metallic rip, and the wind howls past.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3099,
+   "type": "ConditioningCombine",
+   "pos": [
+    3279.8217733333877,
+    2515.551759999926
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 34,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 223
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 224
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      231
+     ]
+    }
+   ],
+   "title": "Combine 1-4",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3100,
+   "type": "H3PromptIDE",
+   "pos": [
+    3920,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 225
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      226
+     ]
+    }
+   ],
+   "title": "Window 5 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 5 of 8, continuing straight on from part 4, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3> and her zipped-up suit, launches <Subject 2> off a ramp and flies over a whole row of parked cars in <Subject 4>, landing hard and racing on.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit zipped up to the collar, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts, fast-paced, with fast camera moves.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> and her pink leather suit zipped all the way up to the collar, racing <Subject 2> toward a steep launch ramp in <Subject 4>, with a long row of parked cars lined up beyond it. The camera tracks low beside her at fast speed as she crouches over the handlebars, twists the throttle wide open and hits the ramp at full speed, launching into the air. The camera pans up with large amplitude at fast speed from beside the cars, looking up as she sails high over the roofs of the whole row of parked cars, the bike silhouetted against the sun. She stretches out over the bike at the top of the jump, then pulls it back under her and lands hard on the far side, the tires slamming into the dirt and kicking up a big burst of dust, the rear wheel fishtailing. The camera trucks left at fast speed to stay with her as she straightens out and races on.\r\n\r\noverall_soundscape:\r\nThe engine screams off the ramp, then wind rushes past overhead as she flies over the cars. A heavy thud and crunch of gravel as she lands, then the engine roars back to full throttle.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3101,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    3920,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 227
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 228
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 229
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 230
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 226
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      232
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 5 / 8 (window 5)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 5 of 8, continuing straight on from part 4, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, launches <Subject 2> off a ramp and flies over a whole row of parked cars in <Subject 4>, landing hard and racing on.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> with her suit unzipped to the middle of her chest, racing <Subject 2> toward a steep launch ramp in <Subject 4>, with a long row of parked cars lined up beyond it. The camera tracks low beside her at fast speed, then whips forward as she hits the ramp and launches into the air. The camera pans up with large amplitude at fast speed from beside the cars, looking up as she sails high over the roofs of the whole row of parked cars, the bike silhouetted against the sun. She stretches out over the bike at the top of the jump, then pulls it back under her and lands hard on the far side in a burst of dust, the rear wheel fishtailing. The camera trucks left at fast speed to stay with her as she straightens out and races on.\n\noverall_soundscape:\nThe engine screams off the ramp, then wind rushes past overhead as she flies over the cars. A heavy thud and crunch of gravel as she lands, then the engine roars back to full throttle.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3102,
+   "type": "ConditioningCombine",
+   "pos": [
+    3651.714262222242,
+    2671.131359999934
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 231
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 232
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      239
+     ]
+    }
+   ],
+   "title": "Combine 1-5",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3103,
+   "type": "H3PromptIDE",
+   "pos": [
+    4640,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 233
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      234
+     ]
+    }
+   ],
+   "title": "Window 6 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a winding red-rock canyon, rocky cliff edges, and a bright, clear blue sky.\r\n<Subject 5> is the canyon wall: a tall, smooth, steeply curved red-rock canyon wall that bends and winds as it runs along the canyon floor.\r\n\r\nsummary:\r\n[reference generation] Part 6 of 8, continuing straight on from part 5, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3> and her zipped-up suit, rides <Subject 2> up onto <Subject 5> in <Subject 4> and races sideways along the winding canyon wall as it curves and turns, filmed from behind and slightly below her, then drops back down onto the canyon floor and races on.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit zipped up to the collar, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n<Subject 5> (the canyon wall): partially_preserved - one long, smooth, curving red-rock canyon wall.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts, fast-paced, with fast camera moves.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> and her pink leather suit zipped all the way up to the collar, racing <Subject 2> at full speed into the winding red-rock canyon of <Subject 4>, right after the landing in part 5. The camera follows close behind her and slightly below her, low to the ground, at fast speed. She veers toward <Subject 5> and rides straight up onto its steep curved face, the bike tilting sideways until she is riding along the canyon wall, leaning hard into it, her pink hair whipping out from under the helmet. The canyon wall bends and winds, and she follows every turn of it at high speed, the bike carving smoothly along the curving rock, the tires gripping and sending small streams of red dust trailing behind. The camera stays behind her and slightly below the whole time, following her through each turn of the canyon at fast speed, the rock walls rushing past on both sides. Near the end of the wall she curves back down its face and drops onto the canyon floor, still riding forward in the same direction, and the camera keeps following behind and slightly below her as she races on.\r\n\r\noverall_soundscape:\r\nThe engine roars and echoes off the canyon walls, and the tires grip and hum on the rock. Wind rushes past, then the engine thunders as she drops back onto the canyon floor.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3104,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    4640,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 235
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 236
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 237
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 238
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 234
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      240
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 6 / 8 (window 6)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 6 of 8, continuing straight on from part 5, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, rides <Subject 2> all the way around a giant steel loop-the-loop track in <Subject 4>, upside down at the top.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> with her suit unzipped to the middle of her chest, racing <Subject 2> at full speed toward a giant steel loop-the-loop track in <Subject 4>. The camera tracks behind her at fast speed as she hits the bottom of the loop and the bike shoots up the curved wall. The camera rolls clockwise with large amplitude to keep her level in frame as she rides up the inside of the loop and hangs completely upside down at the very top, her pink hair whipping out from under the helmet. She comes screaming down the far side of the loop, and the camera arcs out at fast speed to show her exiting the bottom and blasting back onto the dirt track in a spray of dust.\n\noverall_soundscape:\nThe engine roars and echoes off the steel track, and the tires hum and rumble on the metal. The engine whines higher at the top of the loop, then thunders as she shoots back out onto the dirt.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3105,
+   "type": "ConditioningCombine",
+   "pos": [
+    3801.714262222242,
+    2891.131359999934
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 39,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 239
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 240
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      247
+     ]
+    }
+   ],
+   "title": "Combine 1-6",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3106,
+   "type": "H3PromptIDE",
+   "pos": [
+    5360,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 241
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      242
+     ]
+    }
+   ],
+   "title": "Window 7 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\r\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a winding red-rock canyon, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 7 of 8, continuing straight on from part 6, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3> and her zipped-up suit, races <Subject 2> out of the canyon of <Subject 4> and straight off a rocky cliff edge, rotates a full 360 in mid-air, lands far below in slow motion with dirt kicking up behind her, then skids sideways to a stop, filmed from behind the whole time.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit zipped up to the collar, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\r\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts, fast-paced, with a dramatic slow-motion landing.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> and her pink leather suit zipped all the way up to the collar, racing <Subject 2> at full speed along the red-rock canyon floor of <Subject 4>, filmed from behind and slightly below her, right where part 6 ended. Ahead of her the canyon opens up and the ground ends at a rocky cliff edge. She crouches low, twists the throttle wide open and rides straight off the edge, flying out into the open air high above the desert floor. The camera stays behind her the whole time, following her off the cliff and dropping with her, as she rotates the bike a full 360 in mid-air and comes back around facing forward. As she nears the ground, time slows into dramatic slow motion: the bike touches down on the dirt far below, the suspension compressing, and a big cloud of dirt kicks up behind her rear wheel. Time returns to full speed as she brakes hard and kicks the rear wheel out, the bike sliding sideways in a long skid while she keeps facing the same way she was riding, the rear tire carving an arc and spraying a wave of dirt, until the bike slides to a stop. The camera stays behind her through the whole skid.\r\n\r\noverall_soundscape:\r\nThe engine screams off the cliff and wind roars past during the fall. The sound slows and deepens during the slow-motion landing, then snaps back with a heavy thud, followed by the long hiss and crunch of the tires skidding sideways through the dirt as gravel rains down.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3107,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    5360,
+    1600
+   ],
+   "size": [
+    468,
+    604
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 243
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 244
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 245
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 246
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 242
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_audios.ref_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      248
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 7 / 8 (window 7)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 7 of 8, continuing straight on from part 6, in one continuous shot with no cuts. <Subject 1>, wearing <Subject 3>, rides <Subject 2> off a cliff edge in <Subject 4>, spins through the air, lands far below and skids sideways.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> with her suit unzipped to the middle of her chest, racing <Subject 2> flat out toward a rocky cliff edge in <Subject 4>. The camera tracks low behind her at fast speed as she rides straight off the edge and flies out into the open air high above the desert floor. She whips the bike through a full spinning 360 in mid-air while the camera follows her off the cliff and drops with her, pedestaling down with large amplitude at fast speed. She lands on the dirt far below in a huge burst of dust, throws the bike sideways and skids in a long arc, the rear wheel carving a deep trench and spraying a wave of dirt across the frame. The camera arcs around her at fast speed as she holds the slide.\n\noverall_soundscape:\nThe engine screams off the cliff, then wind roars past during the fall. A huge thud of the landing, then the long hiss and crunch of the tires skidding sideways through the dirt as gravel rains down.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3108,
+   "type": "ConditioningCombine",
+   "pos": [
+    3951.714262222242,
+    3111.131359999934
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 41,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 247
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 248
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      255
+     ]
+    }
+   ],
+   "title": "Combine 1-7",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 3109,
+   "type": "H3PromptIDE",
+   "pos": [
+    6080,
+    250
+   ],
+   "size": [
+    700,
+    1150
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "references",
+     "name": "references",
+     "shape": 7,
+     "type": "H3_PROMPT_REFERENCES",
+     "link": 249
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "text",
+     "name": "text",
+     "type": "STRING",
+     "links": [
+      250
+     ]
+    }
+   ],
+   "title": "Window 8 prompt (H3 Prompt IDE)",
+   "properties": {
+    "cnr_id": "h3-prompt-ide",
+    "ver": "9d6ceb0495c45d63f195a056d16c7327950fda58",
+    "Node name for S&R": "H3PromptIDE",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\r\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\r\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\r\n<Subject 3> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a winding red-rock canyon, rocky cliff edges, and a bright, clear blue sky.\r\n\r\nsummary:\r\n[reference generation] Part 8 of 8, continuing straight on from part 7, in one continuous shot with no cuts. <Subject 1> finishes her sideways skid on <Subject 2> in <Subject 3>, comes to a stop with one foot down while staying on the bike, unzips the top of her suit slightly, then in gradual slow motion pulls her helmet off, tosses it away, shakes out her pink hair and smiles seductively at the viewer, without speaking.\r\n\r\nretention_analysis:\r\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\r\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\r\n<Subject 3> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\r\n\r\ndetailed_description:\r\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows and saturated colors. It is one continuous take with no cuts from start to finish, the camera never cutting away, slowing down from fast action into a smooth, gradual slow-motion ending.\r\n\r\n[Shot 1] The shot begins with <Subject 1>, wearing her pink helmet and her pink leather suit zipped all the way up to the collar, still sliding <Subject 2> sideways across the dirt of <Subject 3> at speed, the rear tire spraying a wave of dirt, right where part 7 ended. The camera arcs around her with small amplitude at slow speed to her front as the bike slides to a complete stop and a cloud of dust drifts past and settles. She stays sitting on the bike and plants one boot firmly down on the ground to hold it up, the engine dropping to a low idle. She takes hold of the silver zipper at her collar and slides it down just a couple of inches, opening only a small V at her neckline, the pink leather suit staying snug, closed and fully covering her chest. In the same continuous shot, without any cut, the motion gradually eases into slow motion while the camera zooms in slowly toward her. She pulls the helmet up off her head and tosses it away out of frame, her hands now empty, and her bubblegum-pink wig tumbles free as she shakes her head, her hair swinging and bouncing slowly through the air and catching the sunlight, her red clown nose and red lipstick coming into view. The camera keeps zooming in slowly toward her face as she looks straight into the camera, tilts her head slightly and gives a slow, seductive smile, her eyes half-lidded and confident. She does not speak.\r\n\r\noverall_soundscape:\r\nThe tires hiss and crunch to a stop in the dirt, then the engine settles into a low idle. The sound gradually slows and deepens into a soft, stretched whoosh as the slow motion sets in, with the low rumble of the idling engine underneath. No dialogue.\r\n\r\nnon_diegetic_music:\r\nN/A"
+   ]
+  },
+  {
+   "id": 3110,
+   "type": "MiniMaxH3ReferenceToVideo",
+   "pos": [
+    6080,
+    1600
+   ],
+   "size": [
+    468,
+    584
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip",
+     "name": "clip",
+     "type": "CLIP",
+     "link": 251
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 252
+    },
+    {
+     "localized_name": "audio_vae",
+     "name": "audio_vae",
+     "shape": 7,
+     "type": "VAE",
+     "link": 253
+    },
+    {
+     "label": "ref_image_0",
+     "localized_name": "ref_image_0",
+     "name": "ref_images.ref_image_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 254
+    },
+    {
+     "localized_name": "ref_image_1",
+     "name": "ref_images.ref_image_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_0",
+     "localized_name": "ref_video_0",
+     "name": "ref_videos.ref_video_0",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "label": "ref_video_audio_0",
+     "localized_name": "ref_video_audio_0",
+     "name": "ref_video_audios.ref_video_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "label": "ref_audio_0",
+     "localized_name": "ref_audio_0",
+     "name": "ref_audios.ref_audio_0",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "ref_audio_1",
+     "name": "ref_audios.ref_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "localized_name": "prompt",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 250
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "length",
+     "name": "length",
+     "type": "INT",
+     "widget": {
+      "name": "length"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ref_image_size",
+     "name": "ref_image_size",
+     "type": "COMBO",
+     "widget": {
+      "name": "ref_image_size"
+     },
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_3",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_4",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_5",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_6",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_7",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_images.ref_image_8",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_1",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_videos.ref_video_2",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_1",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    },
+    {
+     "name": "ref_video_audios.ref_video_audio_2",
+     "shape": 7,
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      256
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": []
+    }
+   ],
+   "title": "PROMPT 8 / 8 (window 8)",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.0",
+    "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "prompt": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "subject_definitions:\n<Subject 1> is the adult woman whose appearance comes from <Picture 1>: a clown with a shoulder-length wavy bubblegum-pink wig with full bangs, a round glossy red clown nose, red lipstick, small gold hoop earrings, a fitted pink leather one-piece motorcycle suit with a silver zipper running down the front from the collar, ribbed padded shoulders and knee pads, and pink leather buckled motorcycle boots.\n<Subject 2> is her motorcycle: a lean black-and-hot-pink dirt bike with knobby tires, long suspension and a pink number plate.\n<Subject 3> is her helmet: a glossy hot-pink full-face motorcycle helmet with a dark tinted visor.\n<Subject 4> is the desert stunt park: wide sun-baked dirt tracks, huge dirt ramps, a row of parked cars beside a launch ramp, a giant steel loop-the-loop track, rocky cliff edges, and a bright, clear blue sky.\n\nsummary:\n[reference generation] Part 8 of 8, continuing straight on from part 7, in one continuous shot with no cuts. <Subject 1> skids <Subject 2> to a stop in <Subject 4>, pulls off <Subject 3>, flips her pink hair and smirks at the camera.\n\nretention_analysis:\n<Subject 1> (appears throughout [Shot 1]): fully_preserved - keep her pink wig, red nose, makeup, gold earrings, pink leather motorcycle suit with the silver zipper, padded shoulders and knee pads, and pink boots exactly as in <Picture 1>.\n<Subject 2> (her bike throughout): partially_preserved - the same black-and-pink dirt bike in every part.\n<Subject 3> (her helmet): partially_preserved - the same glossy hot-pink full-face helmet in every part.\n<Subject 4> (the setting throughout): partially_preserved - the same desert stunt park, light and time of day in every part.\n\ndetailed_description:\nThe target video is photorealistic live-action, cinematic, an extreme action-movie stunt sequence in harsh bright midday desert sun with hard shadows, saturated colors and dust in the air. It is one continuous take with no cuts, extremely fast-paced, with the angle changing constantly through fast camera moves.\n\n[Shot 1] The shot begins with <Subject 1>, wearing <Subject 3> with her suit unzipped to the middle of her chest, finishing a long sideways skid on <Subject 2> in <Subject 4>. The bike slides to a stop and a huge wall of dust rolls past her. The camera arcs around her with small amplitude at slow speed to her front as the dust settles, the engine dropping to a low idle. She pulls <Subject 3> off her head, shakes out and flips her bubblegum-pink wig with one hand, and rests the helmet on her thigh, her red clown nose and red lipstick back in view. The camera pushes in with small amplitude at slow speed toward her face as she looks straight into the camera, breathing hard, and gives a slow, cocky smirk.\n\noverall_soundscape:\nThe tires scrape to a stop and the engine drops to a low idle. Dust drifts and hisses down around her, the helmet makes a soft clunk on her thigh, and she lets out a short breathless laugh.\n\nnon_diegetic_music:\nN/A",
+    864,
+    480,
+    1433,
+    "max"
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 3111,
+   "type": "ConditioningCombine",
+   "pos": [
+    4101.71426222224,
+    3331.131359999934
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 42,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "conditioning_1",
+     "name": "conditioning_1",
+     "type": "CONDITIONING",
+     "link": 255
+    },
+    {
+     "localized_name": "conditioning_2",
+     "name": "conditioning_2",
+     "type": "CONDITIONING",
+     "link": 256
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CONDITIONING",
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      257
+     ]
+    }
+   ],
+   "title": "Combine 1-8",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.43.0",
+    "Node name for S&R": "ConditioningCombine",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  }
+ ],
+ "links": [
+  [
+   1,
+   401,
+   0,
+   2001,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   2001,
+   0,
+   2002,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   2002,
+   0,
+   2003,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   2003,
+   0,
+   2004,
+   0,
+   "MODEL"
+  ],
+  [
+   24,
+   418,
+   0,
+   124,
+   0,
+   "NOISE"
+  ],
+  [
+   25,
+   121,
+   0,
+   124,
+   1,
+   "GUIDER"
+  ],
+  [
+   26,
+   910,
+   0,
+   124,
+   2,
+   "SAMPLER"
+  ],
+  [
+   27,
+   123,
+   0,
+   124,
+   3,
+   "SIGMAS"
+  ],
+  [
+   29,
+   124,
+   0,
+   130,
+   0,
+   "LATENT"
+  ],
+  [
+   30,
+   399,
+   0,
+   130,
+   1,
+   "VAE"
+  ],
+  [
+   31,
+   124,
+   0,
+   131,
+   0,
+   "LATENT"
+  ],
+  [
+   32,
+   400,
+   0,
+   131,
+   1,
+   "VAE"
+  ],
+  [
+   74,
+   130,
+   0,
+   133,
+   0,
+   "IMAGE"
+  ],
+  [
+   75,
+   131,
+   0,
+   133,
+   1,
+   "AUDIO"
+  ],
+  [
+   143,
+   110,
+   0,
+   3047,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   144,
+   3031,
+   0,
+   3047,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   145,
+   3047,
+   0,
+   3048,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   146,
+   3032,
+   0,
+   3048,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   176,
+   124,
+   0,
+   3063,
+   0,
+   "LATENT"
+  ],
+  [
+   185,
+   2030,
+   0,
+   3068,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   187,
+   2030,
+   0,
+   3069,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   189,
+   2030,
+   0,
+   3070,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   191,
+   2004,
+   0,
+   3071,
+   0,
+   "MODEL"
+  ],
+  [
+   194,
+   3067,
+   0,
+   121,
+   0,
+   "MODEL"
+  ],
+  [
+   195,
+   3066,
+   0,
+   3067,
+   0,
+   "MODEL"
+  ],
+  [
+   215,
+   3071,
+   0,
+   3096,
+   0,
+   "MODEL"
+  ],
+  [
+   216,
+   3096,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   217,
+   2030,
+   0,
+   3097,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   223,
+   3048,
+   0,
+   3099,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   224,
+   3098,
+   0,
+   3099,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   225,
+   2030,
+   0,
+   3100,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   231,
+   3099,
+   0,
+   3102,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   232,
+   3101,
+   0,
+   3102,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   233,
+   2030,
+   0,
+   3103,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   239,
+   3102,
+   0,
+   3105,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   240,
+   3104,
+   0,
+   3105,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   241,
+   2030,
+   0,
+   3106,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   247,
+   3105,
+   0,
+   3108,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   248,
+   3107,
+   0,
+   3108,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   249,
+   2030,
+   0,
+   3109,
+   0,
+   "H3_PROMPT_REFERENCES"
+  ],
+  [
+   255,
+   3108,
+   0,
+   3111,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   256,
+   3110,
+   0,
+   3111,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   257,
+   3111,
+   0,
+   121,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   271,
+   5,
+   0,
+   123,
+   0,
+   "MODEL"
+  ],
+  [
+   272,
+   5,
+   0,
+   3066,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   398,
+   0,
+   110,
+   0,
+   "CLIP"
+  ],
+  [
+   8,
+   399,
+   0,
+   110,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   400,
+   0,
+   110,
+   2,
+   "VAE"
+  ],
+  [
+   10,
+   2010,
+   0,
+   110,
+   3,
+   "IMAGE"
+  ],
+  [
+   45,
+   2010,
+   0,
+   2030,
+   0,
+   "IMAGE"
+  ],
+  [
+   79,
+   398,
+   0,
+   3031,
+   0,
+   "CLIP"
+  ],
+  [
+   80,
+   399,
+   0,
+   3031,
+   1,
+   "VAE"
+  ],
+  [
+   81,
+   400,
+   0,
+   3031,
+   2,
+   "VAE"
+  ],
+  [
+   82,
+   2010,
+   0,
+   3031,
+   3,
+   "IMAGE"
+  ],
+  [
+   83,
+   398,
+   0,
+   3032,
+   0,
+   "CLIP"
+  ],
+  [
+   84,
+   399,
+   0,
+   3032,
+   1,
+   "VAE"
+  ],
+  [
+   85,
+   400,
+   0,
+   3032,
+   2,
+   "VAE"
+  ],
+  [
+   86,
+   2010,
+   0,
+   3032,
+   3,
+   "IMAGE"
+  ],
+  [
+   219,
+   398,
+   0,
+   3098,
+   0,
+   "CLIP"
+  ],
+  [
+   220,
+   399,
+   0,
+   3098,
+   1,
+   "VAE"
+  ],
+  [
+   221,
+   400,
+   0,
+   3098,
+   2,
+   "VAE"
+  ],
+  [
+   222,
+   2010,
+   0,
+   3098,
+   3,
+   "IMAGE"
+  ],
+  [
+   227,
+   398,
+   0,
+   3101,
+   0,
+   "CLIP"
+  ],
+  [
+   228,
+   399,
+   0,
+   3101,
+   1,
+   "VAE"
+  ],
+  [
+   229,
+   400,
+   0,
+   3101,
+   2,
+   "VAE"
+  ],
+  [
+   230,
+   2010,
+   0,
+   3101,
+   3,
+   "IMAGE"
+  ],
+  [
+   235,
+   398,
+   0,
+   3104,
+   0,
+   "CLIP"
+  ],
+  [
+   236,
+   399,
+   0,
+   3104,
+   1,
+   "VAE"
+  ],
+  [
+   237,
+   400,
+   0,
+   3104,
+   2,
+   "VAE"
+  ],
+  [
+   238,
+   2010,
+   0,
+   3104,
+   3,
+   "IMAGE"
+  ],
+  [
+   243,
+   398,
+   0,
+   3107,
+   0,
+   "CLIP"
+  ],
+  [
+   244,
+   399,
+   0,
+   3107,
+   1,
+   "VAE"
+  ],
+  [
+   245,
+   400,
+   0,
+   3107,
+   2,
+   "VAE"
+  ],
+  [
+   246,
+   2010,
+   0,
+   3107,
+   3,
+   "IMAGE"
+  ],
+  [
+   251,
+   398,
+   0,
+   3110,
+   0,
+   "CLIP"
+  ],
+  [
+   252,
+   399,
+   0,
+   3110,
+   1,
+   "VAE"
+  ],
+  [
+   253,
+   400,
+   0,
+   3110,
+   2,
+   "VAE"
+  ],
+  [
+   254,
+   2010,
+   0,
+   3110,
+   3,
+   "IMAGE"
+  ],
+  [
+   186,
+   3068,
+   0,
+   110,
+   9,
+   "STRING"
+  ],
+  [
+   188,
+   3069,
+   0,
+   3031,
+   9,
+   "STRING"
+  ],
+  [
+   190,
+   3070,
+   0,
+   3032,
+   9,
+   "STRING"
+  ],
+  [
+   218,
+   3097,
+   0,
+   3098,
+   9,
+   "STRING"
+  ],
+  [
+   226,
+   3100,
+   0,
+   3101,
+   9,
+   "STRING"
+  ],
+  [
+   234,
+   3103,
+   0,
+   3104,
+   9,
+   "STRING"
+  ],
+  [
+   242,
+   3106,
+   0,
+   3107,
+   9,
+   "STRING"
+  ],
+  [
+   250,
+   3109,
+   0,
+   3110,
+   9,
+   "STRING"
+  ],
+  [
+   275,
+   110,
+   1,
+   124,
+   4,
+   "LATENT"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.7972024500001333,
+   "offset": [
+    -1954.7777306170779,
+    531.6856846522145
+   ]
+  },
+  "frontendVersion": "1.57.6",
+  "VHS_latentpreview": true,
+  "VHS_latentpreviewrate": 0,
+  "VHS_MetadataImage": true,
+  "VHS_KeepIntermediate": true,
+  "ue_links": [],
+  "links_added_by_ue": []
+ },
+ "extensions": {
+  "seed_widgets": {
+   "418": 0
+  },
+  "widget_idx_map": {
+   "123": {
+    "scheduler": 0
+   },
+   "418": {
+    "noise_seed": 0
+   },
+   "910": {
+    "sampler_name": 0
+   }
+  }
+ },
+ "version": 0.4
+}
