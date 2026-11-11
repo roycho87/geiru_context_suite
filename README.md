@@ -324,7 +324,7 @@ I'm a clown and I'm ridiculous. My workflow names are equally so. The names can 
 | everyone_wants_a_piece_of_the_clown | `motion_context_chain_cntxt_and_anchors` |
 | withers_has_big_nattys | `static_vlog_odd_even_shots_cntxt_and_anchors` |
 | sane_clown_combiner | `join_clips_into_one_video` |
-| Clown Clontrol Freak | `hybrid_windows_window_director_3_windows` |
+| Clown Control Freak | `hybrid_windows_window_director_3_windows` |
 
 ### Mad Clown Inventor example
 
@@ -360,9 +360,9 @@ https://github.com/user-attachments/assets/840d5913-4df5-488a-ae09-3f3056f7e9b7
 
 `example_workflows/clowns_for_picard.json` is the Clown Coaster example as I actually rendered it: widescreen 1328 × 736 (0.98 MP), with more detailed, faster-moving prompts, and `sound_first` on as well. The 8 prompts are in big **WINDOW 1-8 PROMPT** text boxes in the green group at the bottom, in ride order, so you don't have to type into the small prompt nodes. Otherwise it's set up and used like Clown Coaster (same length, windows, settings and SAVE LATENT node). It's a big render (a full minute at almost 1 MP); lower the size if you run out of memory.
 
-### Clown Clontrol Freak example
+### Clown Control Freak example
 
-`example_workflows/clown_clontrol_freak.json` is a **Geiru Window Director** workflow: a 600-frame clip in 3 windows with one prompt per window, written in three H3 Prompt IDE nodes. The clown walks through a park, pets a duck at the pond, then falls back on the grass and the view cuts overhead. Load your subject picture into Picture 1, then use the Director's buttons (start with **Run/Re-roll**). The READ ME note in the workflow walks through it.
+`example_workflows/clown_control_freak.json` is a **Geiru Window Director** workflow: a 600-frame clip in 3 windows with one prompt per window, written in three H3 Prompt IDE nodes. The clown walks through a park, pets a duck at the pond, then falls back on the grass and the view cuts overhead. Load your subject picture into Picture 1, then use the Director's buttons (start with **Run/Re-roll**). The READ ME note in the workflow walks through it.
 
 ### Other packs the examples use
 
