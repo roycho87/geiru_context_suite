@@ -1,8 +1,8 @@
 [project]
 name = "geiru-context-suite"
-description = "Geiru Context Suite custom nodes for ComfyUI"
+description = "Anti-degradation nodes for MiniMax H3 in ComfyUI. Keep long videos and continuation chains sharp, with steady colour and no burn-in: Keystone and capstone hold clip 1's detail, Context Noise stops held frames from baking in, and Geiru Context / Anchoring handle clean joins. Includes Geiru Hybrid Windows for seamless long fast-motion renders and Geiru Window Director to build them window by window (approve, re-roll, rewind, blend). Example workflows included."
 version = "1.0.0"
-license = { file = "LICENSE" }
+license = { text = "GPL-3.0" }
 
 [project.urls]
 Repository = "https://github.com/roycho87/geiru_context_suite"
