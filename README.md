@@ -133,6 +133,10 @@ More Anchoring workflows are in [Geiru-Prophecy-Experimental-](https://github.co
 - [everyone_wants_a_piece_of_the_clown.json](example_workflows/everyone_wants_a_piece_of_the_clown.json): a Motion Context chain with Geiru Context (39, drop_first 17) and Geiru Anchoring (39, drop_last 17).
 - [withers_has_big_nattys.json](example_workflows/withers_has_big_nattys.json): the static vlog (odd shots fresh, even shots continue). On even shots, Geiru Context (39, drop_first 17) holds the end of the shot before at the start, and Geiru Anchoring (39, drop_last 17) holds the start of the shot after at the end. Motion Context's Load / Save Latent nodes are still used for the clips.
 
+### Clip length
+
+For continuations, use clip lengths that are multiples of 3: **141** (5.9 s), **192** (8 s), **243** (10.1 s), **294** (12.25 s) or **345** (14.4 s). H3's audio runs at 40 steps a second against 24 video frames, so only every third frame lands exactly on an audio step. With other lengths (like 124 or 175) the held audio is cut a third of a step off from where it belongs, and in testing the sound built up and got louder down the chain.
+
 ### Joining the clips
 
 Each clip is saved whole (all of its frames, overlap included), so trim them when you join them. `drop_last` doesn't remove the overlap, it only changes what's in it. With Geiru Context at 39, `drop_last` 17:
