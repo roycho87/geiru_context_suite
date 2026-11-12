@@ -1,0 +1,12 @@
+[project]
+name = "geiru-context-suite"
+description = "Geiru Context Suite custom nodes for ComfyUI"
+version = "1.0.0"
+license = { file = "LICENSE" }
+
+[project.urls]
+Repository = "https://github.com/roycho87/geiru_context_suite"
+
+[tool.comfy]
+PublisherId = "roycho87"
+DisplayName = "Geiru Context Suite"
