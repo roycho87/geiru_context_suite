@@ -486,8 +486,6 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
         s0 = float(sig[0])
         args = _pass_args(extra_args, counter["pass"])
         spans = crop_spans(wi) if h.crop_windows else None
-        if spans is not None and ramp and h.context_noise_fade == "ethanfel":
-            spans = None                                    # ethanfel's per-step ratio works on the full length
         # the model reads its keep mask from the conds at full length, so that one is always built full length
         m_full = pack(m).to(work_dev)
         h.mask_conds = model._denoise_mask_values(m_full, shapes) if multi else {}
@@ -526,8 +524,14 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
         if ramp and h.context_noise_fade == "ethanfel":
             args = dict(args)
             mo2 = dict(args["model_options"])
-            mo2["denoise_mask_function"] = _ratio_fn(mo2.get("denoise_mask_function"), ramp, dims[0], unpack, pack,
-                                                     m_p.shape)
+            if spans is None:
+                r_ramp, r_unpack, r_pack = ramp, unpack, pack
+            else:                                           # cropped pass: overlap positions inside the window
+                off_r = spans[0][0]
+                r_ramp = [(i - off_r, v) for i, v in ramp]
+                r_unpack, r_pack = (lambda x, _s=run_shapes: unpack_any(x, _s)), pack_any
+            mo2["denoise_mask_function"] = _ratio_fn(mo2.get("denoise_mask_function"), r_ramp, dims[0], r_unpack,
+                                                     r_pack, m_p.shape)
             args["model_options"] = mo2
         ks = getattr(executor, "class_obj", None)
         old_opts, old_shapes = None, None
