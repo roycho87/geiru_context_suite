@@ -132,6 +132,8 @@ Every frame's attention is a pie shared by the prompt, the references, the sound
 
 It's applied on the 13 **lighting blocks** (31-33, 36-44, 47), found in a block sweep to carry brightness. That's what holds clip 1's brightness down a long chain. It costs a little motion (hair moved a bit less in testing).
 
+It runs on whatever attention your model uses (Sage, Kijai's Sage patch, PyTorch, Comfy Kitchen, ...), so it only costs a little speed: on a 5090, 4-6% slower than off with Sage, about 12% with PyTorch attention.
+
 Put it on the model line after your other model patches, right before the guider, and plug Geiru Keystone's `av_latent` into `latent` (only read, to find the keystone). It follows the `degradation_protection` switch and passes through on shots with no keystone.
 
 | Setting | Meaning |
