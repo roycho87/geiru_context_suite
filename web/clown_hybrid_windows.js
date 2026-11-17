@@ -4,14 +4,16 @@
 //           crash_protection, then (advanced) keystone_swap, keystone_step, keystone_attention, balance, block_mode,
 //           blocks, back_capstone, capstone_step, context_noise, context_noise_strength, context_noise_fade,
 //           sound_first, finished_handoff
-//   before keystone attention: the same without keystone_attention, balance, block_mode, blocks
+//   (take_from sits right after balance)
+//   before take_from: the same without take_from
+//   before keystone attention: the same without keystone_attention, balance, take_from, block_mode, blocks
 //   prev:   ..., keystone_swap, back_capstone, finished_handoff, capstone_step, fuse_method, freenoise,
 //           split_conds_to_windows, sound_first, context_noise, context_noise_strength, context_noise_fade,
 //           crash_protection
 //   old A/B: ..., back_capstone, capstone_step, fuse_method, freenoise, split_conds_to_windows, finished_handoff
 //            (, sound_first)
 // - settings that do nothing are greyed out: keystone_step and keystone_attention when keystone_swap is off,
-//   balance / block_mode / blocks when keystone_attention is off, capstone_step when back_capstone is off,
+//   balance / take_from / block_mode / blocks when keystone_attention is off, capstone_step when back_capstone is off,
 //   context noise strength / fade when context_noise is off. block_mode = lighting blocks greys the blocks box and
 //   shows the lighting blocks in it.
 // - a balloon on the settings that must stay the same for a whole Window Director take, with a note under the title.
@@ -20,6 +22,10 @@ import { app } from "../../scripts/app.js";
 const NO_KA = ["context_length", "context_overlap", "switch_step", "fuse_method", "freenoise", "split_conds_to_windows",
                "crash_protection", "keystone_swap", "keystone_step", "back_capstone", "capstone_step", "context_noise",
                "context_noise_strength", "context_noise_fade", "sound_first", "finished_handoff"];
+const NO_TF = ["context_length", "context_overlap", "switch_step", "fuse_method", "freenoise", "split_conds_to_windows",
+               "crash_protection", "keystone_swap", "keystone_step", "keystone_attention", "balance", "block_mode",
+               "blocks", "back_capstone", "capstone_step", "context_noise", "context_noise_strength",
+               "context_noise_fade", "sound_first", "finished_handoff"];
 const PREV = ["context_length", "context_overlap", "switch_step", "keystone_swap", "back_capstone", "finished_handoff",
               "capstone_step", "fuse_method", "freenoise", "split_conds_to_windows", "sound_first", "context_noise",
               "context_noise_strength", "context_noise_fade", "crash_protection"];
@@ -27,7 +33,7 @@ const OLD = ["context_length", "context_overlap", "switch_step", "keystone_swap"
              "fuse_method", "freenoise", "split_conds_to_windows", "finished_handoff", "sound_first"];
 const LIGHTING = "31-33, 36-44, 47";
 // what a setting missing from an older workflow starts at
-const DEFAULTS = { keystone_step: 0, keystone_attention: false, balance: 20, block_mode: "lighting blocks", blocks: LIGHTING };
+const DEFAULTS = { keystone_step: 0, keystone_attention: false, balance: 20, take_from: "context slice", block_mode: "lighting blocks", blocks: LIGHTING };
 const BALLOON = "\u{1F388}";
 const FIXED = ["context_length", "context_overlap", "switch_step", "split_conds_to_windows", "sound_first", "finished_handoff"];
 const NOTE = BALLOON + " = Settings fixed between windows";
@@ -52,6 +58,7 @@ app.registerExtension({
             dis("keystone_attention", !key);
             const ka = key && on("keystone_attention");
             dis("balance", !ka);
+            dis("take_from", !ka);
             dis("block_mode", !ka);
             const mode = get(node, "block_mode");
             const box = get(node, "blocks");
@@ -125,7 +132,9 @@ app.registerExtension({
             const v = info?.widgets_values;
             let layout = null, fill = {};
             if (Array.isArray(v) && v.length >= 10) {
-                if (v.length === NO_KA.length && typeof v[3] === "string") {
+                if (v.length === NO_TF.length && (v[11] === "lighting blocks" || v[11] === "custom blocks")) {
+                    layout = NO_TF;                        // saved before take_from: block_mode in slot 11
+                } else if (v.length === NO_KA.length && typeof v[3] === "string") {
                     layout = NO_KA;                        // saved before keystone attention: fuse_method in slot 3
                 } else if (typeof v[3] === "boolean" && typeof v[6] === "number") {
                     layout = PREV;                         // keystone_swap in slot 3, capstone_step in slot 6

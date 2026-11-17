@@ -132,13 +132,14 @@ Every frame's attention is a pie shared by the prompt, the references, the sound
 
 It's applied on the 13 **lighting blocks** (31-33, 36-44, 47), found in a block sweep to carry brightness. That's what holds clip 1's brightness down a long chain. It costs a little motion (hair moved a bit less in testing).
 
-It runs on whatever attention your model uses (Sage, Kijai's Sage patch, PyTorch, Comfy Kitchen, ...), so it only costs a little speed: on a 5090, 4-6% slower than off with Sage, about 12% with PyTorch attention.
+It runs on whatever attention your model uses (Sage, Kijai's Sage patch, PyTorch, Comfy Kitchen, ...). With `take_from` = context slice it costs roughly 5-10% speed; whole pie costs close to nothing. The console shows how much attention the keystone actually gets on your shot.
 
 Put it on the model line after your other model patches, right before the guider, and plug Geiru Keystone's `av_latent` into `latent` (only read, to find the keystone). It follows the `degradation_protection` switch and passes through on shots with no keystone.
 
 | Setting | Meaning |
 |---|---|
-| `balance` | 20 (default). 1 = normal. |
+| `balance` | A weight on the keystone: 20 (default) = each keystone token counts 20 times as much when attention is shared out. 1 = off. With context slice, 20 comes to about 4x the keystone's normal attention (tops out around 6x); with whole pie, about 8x. |
+| `take_from` | Who gives up attention for it. **context slice** (default, recommended): only the carried frames; everything else keeps its exact share. Holds the keystone's look best, with a slight slowdown (about 5-10%). **whole pie**: everything gives up a little; close to no speed cost, but holds the look less well. |
 | `block_mode` | `lighting blocks` (greys out the box) or `custom blocks`. |
 | `blocks` | Your own blocks for `custom blocks`, e.g. `31-33, 36-44, 47`. |
 
@@ -169,7 +170,7 @@ It's meant for scenes with fast motion that need to be seamless, not to beat the
 | `detail_latent` | Optional input: use this latent's first frame as the keystone instead of window 1's. |
 | **Advanced** (Show advanced inputs) | |
 | `keystone_swap` / `keystone_step` | Window 1's finished first frame locked into every later window, from `keystone_step`. |
-| `keystone_attention` | Needs `keystone_swap`. Keystone Attention during each window's own steps, with `balance`, `block_mode` and `blocks` as on the node. |
+| `keystone_attention` | Needs `keystone_swap`. Keystone Attention during each window's own steps (only on the window being made), with `balance`, `take_from`, `block_mode` and `blocks` as on the node. |
 | `back_capstone` / `capstone_step` | Window 1's last latent tacked onto the back of every later window, from `capstone_step` (keep it below `switch_step`). |
 | `context_noise` / `_strength` / `_fade` | ethanfel's context noise on each window's locked overlap during its own steps. Fade **linear** (default, best in the [fade sweep](https://github.com/roycho87/NerdNotes/blob/main/20261101/frame0_conclusions.md)), **ease** or **ethanfel**. |
 | `sound_first` | Renders the sound first on its own, then locks it in and renders the picture. |

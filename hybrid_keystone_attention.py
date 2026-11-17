@@ -7,6 +7,7 @@ up exactly what the keystone gains. Everything else (prompt, references, audio, 
 Off on the blend steps (no keystone there) and on window 1 (no keystone yet).
 """
 import logging
+import math
 import re
 import types
 
@@ -23,7 +24,7 @@ KEY = "geiru_hybrid_keystone_attention"
 
 
 # Which ways of doing the balanced attention work on this machine: None = not tried yet, True / False once known.
-_WORKS = {"sage": None, "own": None, "torch": None}
+_WORKS = {"sage": None, "own": None, "torch": None, "mask": None}
 
 
 def _torch_lse(q, k, v, scale):
@@ -53,16 +54,17 @@ def _try(name, what, fn):
     try:
         r = fn()
     except Exception as exc:
-        if _WORKS[name]:
+        oom = isinstance(exc, getattr(comfy.model_management, "OOM_EXCEPTION", ())) or "out of memory" in str(exc).lower()
+        if _WORKS[name] or oom:              # running out of memory says nothing about whether this way works
             raise
         _WORKS[name] = False
-        logging.info("[%s] %s doesn't work here (%s), using the next way", WHO, what, exc)
+        logging.warning("[%s] %s doesn't work here (%s), using the next way (slower) until ComfyUI restarts",
+                        WHO, what, exc)
         return None
     if _WORKS[name] is None:
         _WORKS[name] = True
         logging.info("[%s] balanced attention: %s", WHO, what)
     return r
-
 
 class _Skip(Exception):
     pass
@@ -118,10 +120,11 @@ def _held_video_latents(denoise_mask, latent_t):
 
 
 
-def add_keystone_attention(m, balance, chosen, anchors_fn):
+def add_keystone_attention(m, balance, chosen, anchors_fn, whole=False):
     """Put keystone attention on model patcher m (already a clone), on blocks `chosen`.
     anchors_fn(lt): the window-local latents that are keystones on this model call (or None = off for this call);
-    anchors_fn(None) is asked first, as a quick on/off check."""
+    anchors_fn(None) is asked first, as a quick on/off check.
+    whole: take the keystone's extra pull from the whole attention, not only from the overlap (the context slice)."""
     b = float(balance)
     stats = {"logged": False}
 
@@ -188,12 +191,32 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         scale = d ** -0.5
         B, H, T, _ = qb.shape
         S_len = kb.shape[2]
+        if whole and own is not None and route == "own":
+            # whole pie on an attention that takes a bias: the keystone's scores get +log(balance), one pass
+            def with_bias():
+                row = torch.zeros([1, S_len], dtype=kb.dtype, device=kb.device)
+                row[0, ki] = math.log(max(b, 1e-6))
+                return own(qb, kb, vb, mask=row)
+            out = _try("mask", "a bias on the keystone, in the attention the model is set to", with_bias)
+            if out is not None:
+                if not stats["logged"]:
+                    stats["logged"] = True
+                    try:                                    # one extra measuring pass, once, for the console
+                        _, lse = _torch_lse(qb, kb, vb, scale)
+                        _, lseK = _torch_lse(qb, kb.index_select(2, ki), vb.index_select(2, ki), scale)
+                        pK = torch.exp(lseK - lse)
+                        log_shares(blk, ki, pK, b * pK / (1.0 + (b - 1.0) * pK))
+                    except Exception:
+                        logging.info("[%s] balance x%.2f from the whole pie on block %s", WHO, b, blk)
+                return out.transpose(1, 2).reshape(B, T, H * d)
         kK, vK = kb.index_select(2, ki), vb.index_select(2, ki)
-        kC, vC = kb.index_select(2, ci), vb.index_select(2, ci)
+        kC, vC = (None, None) if whole else (kb.index_select(2, ci), vb.index_select(2, ci))
 
         def with_lse(main):
             out, lse = main()
             oK, lseK = _torch_lse(qb, kK, vK, scale)
+            if whole:                                # whole pie: the context's part isn't needed
+                return out, oK, None, torch.exp(lseK - lse).unsqueeze(-1), None
             oC, lseC = _torch_lse(qb, kC, vC, scale)
             return out, oK, oC, torch.exp(lseK - lse).unsqueeze(-1), torch.exp(lseC - lse).unsqueeze(-1)
 
@@ -208,7 +231,7 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
             pC = shares[..., 1:2].float().clamp_(0.0, 1.0)
             del shares
             oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
-            oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+            oC = None if whole else F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
             return out, oK, oC, pK, pC
 
         r = None
@@ -233,10 +256,26 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         pC = full[..., d + 1:d + 2].float()
         del full, v2
         oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
-        oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+        oC = None if whole else F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
         return finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d)
 
+    def log_shares(blk, ki, pK, new_pK, pC=None, new_pC=None):
+        a, n = float(pK.float().mean()), float(new_pK.float().mean())
+        msg = (f"[{WHO}] balance x{b:g} ({'whole pie' if whole else 'context slice'}), block {blk}, first step: "
+               f"keystone gets {a * 100:.1f}% -> {n * 100:.1f}% of the attention ({n / max(a, 1e-9):.1f}x)")
+        if pC is not None:
+            msg += f", carried frames {float(pC.mean()) * 100:.1f}% -> {float(new_pC.mean()) * 100:.1f}%"
+        logging.info(msg)
+
     def finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d):
+        if whole:
+            # the keystone's weights x balance, then everything renormalised: every other part gives up a little
+            z = 1.0 + (b - 1.0) * pK
+            out = ((out.float() + (b - 1.0) * pK * oK.float()) / z).to(out.dtype)
+            if not stats["logged"]:
+                stats["logged"] = True
+                log_shares(blk, ki, pK, b * pK / z)
+            return out.transpose(1, 2).reshape(B, T, H * d)
         sh = pK + pC
         denom = b * pK + pC
         new_pK = torch.where(denom > 1e-12, sh * b * pK / denom.clamp_min(1e-12), pK)
@@ -244,10 +283,7 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         out = (out.float() + delta * (oK.float() - oC.float())).to(out.dtype)
         if not stats["logged"]:
             stats["logged"] = True
-            logging.info("[%s] balance x%.2f: keystone rows %d, context rows %d; block %s mean shares "
-                         "keystone %.4f -> %.4f, context %.4f -> %.4f (rest unchanged %.4f)",
-                         WHO, b, ki.numel(), ci.numel(), blk, float(pK.mean()), float(new_pK.mean()),
-                         float(pC.mean()), float((sh - new_pK).mean()), float((1 - sh).mean()))
+            log_shares(blk, ki, pK, new_pK, pC, sh - new_pK)
         return out.transpose(1, 2).reshape(B, T, H * d)
 
     # 3) this node's own attention forward on its blocks. It replaces whatever attention forward is there (H3's,
@@ -269,9 +305,9 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
             pref = getattr(attn, "comfy_attention", None) if stock else None
             kw = {"preferred_attention": pref} if pref is not None else {}
 
-            def own(qg, kg, vg):
+            def own(qg, kg, vg, mask=None):
                 h = qg.shape[1]
-                o = comfy_attention.optimized_attention(qg, kg, vg, h, mask=None, skip_reshape=True,
+                o = comfy_attention.optimized_attention(qg, kg, vg, h, mask=mask, skip_reshape=True,
                                                         transformer_options=topts, **kw)
                 return o.reshape(qg.shape[0], qg.shape[2], h, -1).transpose(1, 2)
 

@@ -19,6 +19,7 @@ degradation_protection switch: off = pass through, like Keystone / Late Lock / C
 """
 
 import logging
+import math
 import re
 import types
 
@@ -33,7 +34,7 @@ import comfy.quant_ops
 WHO = "Geiru Keystone Attention"
 
 # Which ways of doing the balanced attention work on this machine: None = not tried yet, True / False once known.
-_WORKS = {"sage": None, "own": None, "torch": None}
+_WORKS = {"sage": None, "own": None, "torch": None, "mask": None}
 
 
 def _torch_lse(q, k, v, scale):
@@ -63,10 +64,12 @@ def _try(name, what, fn):
     try:
         r = fn()
     except Exception as exc:
-        if _WORKS[name]:
+        oom = isinstance(exc, getattr(comfy.model_management, "OOM_EXCEPTION", ())) or "out of memory" in str(exc).lower()
+        if _WORKS[name] or oom:              # running out of memory says nothing about whether this way works
             raise
         _WORKS[name] = False
-        logging.info("[%s] %s doesn't work here (%s), using the next way", WHO, what, exc)
+        logging.warning("[%s] %s doesn't work here (%s), using the next way (slower) until ComfyUI restarts",
+                        WHO, what, exc)
         return None
     if _WORKS[name] is None:
         _WORKS[name] = True
@@ -79,6 +82,7 @@ KEY = "geiru_keystone_balance"
 # The blocks found to carry brightness on H3 (block search, Nov 2026): balance on these 13 holds a chain's brightness.
 LIGHTING_BLOCKS = "31-33, 36-44, 47"
 BLOCK_MODES = ["lighting blocks", "custom blocks"]
+TAKE_FROM = ["context slice", "whole pie"]
 
 
 def parse_blocks(text):
@@ -133,10 +137,13 @@ class GeiruKeystoneAttention:
                                              "the keystone (and capstone) and whether degradation protection is on. "
                                              "Only read: the latent still goes from Keystone to the sampler as before."}),
             "balance": ("FLOAT", {"default": 20.0, "min": 0.0, "max": 100000.0, "step": 0.01, "round": 0.01,
-                "tooltip": "How the slice shared by the keystone and the carried context is split. 1 = normal. "
-                           "2 = the keystone pulls twice as hard compared with the context, and the context gives up "
-                           "exactly what the keystone gains. Every other slice (prompt, references, audio, new "
-                           "frames) stays exactly as it would be."}),
+                "tooltip": "A weight on the keystone. 20 = each keystone token counts 20 times as much as it "
+                           "normally would when attention is shared out. 1 = off.\n"
+                           "context slice: shares out only between the keystone and the carried frames, so 20 ends up as "
+                           "about 4x the keystone's normal attention (tops out around 6x).\n"
+                           "whole pie: shares out with everything, so 20 ends up as about 8x (no limit).\n"
+                           "Measured on the lighting blocks; varies by scene. The console shows the exact amount for "
+                           "your shot when sampling starts."}),
             "block_mode": (BLOCK_MODES, {"default": "lighting blocks",
                 "tooltip": "lighting blocks = the 13 blocks found to carry brightness (31-33, 36-44, 47). "
                            "custom blocks = type your own below."}),
@@ -144,6 +151,13 @@ class GeiruKeystoneAttention:
                 "tooltip": "Which transformer blocks (0-49) to apply it in, for custom blocks. Ranges and single "
                            "numbers, commas between: 31-33, 36-44, 47  or  31,32,33. Spaces don't matter."}),
             "enabled": ("BOOLEAN", {"default": True}),
+            "take_from": (TAKE_FROM, {"default": "context slice",
+                "tooltip": "Who gives up attention so the keystone can pull harder.\n"
+                           "context slice (default, recommended): only the carried frames give it up; the prompt, "
+                           "references, audio and new frames keep their exact share. Holds the keystone's look best, "
+                           "at the cost of a slight sampling slowdown (about 5-10%).\n"
+                           "whole pie: everything gives up a little. Close to no speed cost on any attention, but holds "
+                           "the keystone's look less well."}),
         }}
 
     RETURN_TYPES = ("MODEL",)
@@ -155,8 +169,9 @@ class GeiruKeystoneAttention:
                    "VRAM or Sage patches): on its own blocks it does the balanced attention itself, only where the balance "
                    "applies, and leaves everything else to whatever attention is set.")
 
-    def patch(self, model, latent, balance, block_mode, blocks, enabled, **_old_settings):
-        # **_old_settings: start_step / end_step / take_from from older workflows are ignored
+    def patch(self, model, latent, balance, block_mode, blocks, enabled, take_from="context slice", **_old_settings):
+        # **_old_settings: start_step / end_step from older workflows are ignored
+        whole = str(take_from).strip().lower().startswith("whole")
         if not enabled or abs(balance - 1.0) < 1e-6:
             return (model,)
         if isinstance(latent, dict) and latent.get("geiru_protection", True) is False:
@@ -173,7 +188,8 @@ class GeiruKeystoneAttention:
             print(f"[{WHO}] no blocks given - passing through")
             return (model,)
         block_set = frozenset(chosen)
-        print(f"[{WHO}] balance x{float(balance):g} on {len(chosen)} blocks ({block_mode}): {_ranges(chosen)}")
+        print(f"[{WHO}] balance x{float(balance):g} on {len(chosen)} blocks ({block_mode}): {_ranges(chosen)}"
+              f"{', taken from the whole pie' if whole else ''}")
 
         b = float(balance)
         stats = {"logged": False}
@@ -240,12 +256,32 @@ class GeiruKeystoneAttention:
             scale = d ** -0.5
             B, H, T, _ = qb.shape
             S_len = kb.shape[2]
+            if whole and own is not None and route == "own":
+                # whole pie on an attention that takes a bias: the keystone's scores get +log(balance), one pass
+                def with_bias():
+                    row = torch.zeros([1, S_len], dtype=kb.dtype, device=kb.device)
+                    row[0, ki] = math.log(max(b, 1e-6))
+                    return own(qb, kb, vb, mask=row)
+                out = _try("mask", "a bias on the keystone, in the attention the model is set to", with_bias)
+                if out is not None:
+                    if not stats["logged"]:
+                        stats["logged"] = True
+                        try:                                    # one extra measuring pass, once, for the console
+                            _, lse = _torch_lse(qb, kb, vb, scale)
+                            _, lseK = _torch_lse(qb, kb.index_select(2, ki), vb.index_select(2, ki), scale)
+                            pK = torch.exp(lseK - lse)
+                            log_shares(blk, ki, pK, b * pK / (1.0 + (b - 1.0) * pK))
+                        except Exception:
+                            logging.info("[%s] balance x%.2f from the whole pie on block %s", WHO, b, blk)
+                    return out.transpose(1, 2).reshape(B, T, H * d)
             kK, vK = kb.index_select(2, ki), vb.index_select(2, ki)
-            kC, vC = kb.index_select(2, ci), vb.index_select(2, ci)
+            kC, vC = (None, None) if whole else (kb.index_select(2, ci), vb.index_select(2, ci))
 
             def with_lse(main):
                 out, lse = main()
                 oK, lseK = _torch_lse(qb, kK, vK, scale)
+                if whole:                                # whole pie: the context's part isn't needed
+                    return out, oK, None, torch.exp(lseK - lse).unsqueeze(-1), None
                 oC, lseC = _torch_lse(qb, kC, vC, scale)
                 return out, oK, oC, torch.exp(lseK - lse).unsqueeze(-1), torch.exp(lseC - lse).unsqueeze(-1)
 
@@ -260,7 +296,7 @@ class GeiruKeystoneAttention:
                 pC = shares[..., 1:2].float().clamp_(0.0, 1.0)
                 del shares
                 oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
-                oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+                oC = None if whole else F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
                 return out, oK, oC, pK, pC
 
             r = None
@@ -285,10 +321,26 @@ class GeiruKeystoneAttention:
             pC = full[..., d + 1:d + 2].float()
             del full, v2
             oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
-            oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+            oC = None if whole else F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
             return finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d)
 
+        def log_shares(blk, ki, pK, new_pK, pC=None, new_pC=None):
+            a, n = float(pK.float().mean()), float(new_pK.float().mean())
+            msg = (f"[{WHO}] balance x{b:g} ({'whole pie' if whole else 'context slice'}), block {blk}, first step: "
+                   f"keystone gets {a * 100:.1f}% -> {n * 100:.1f}% of the attention ({n / max(a, 1e-9):.1f}x)")
+            if pC is not None:
+                msg += f", carried frames {float(pC.mean()) * 100:.1f}% -> {float(new_pC.mean()) * 100:.1f}%"
+            logging.info(msg)
+
         def finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d):
+            if whole:
+                # the keystone's weights x balance, then everything renormalised: every other part gives up a little
+                z = 1.0 + (b - 1.0) * pK
+                out = ((out.float() + (b - 1.0) * pK * oK.float()) / z).to(out.dtype)
+                if not stats["logged"]:
+                    stats["logged"] = True
+                    log_shares(blk, ki, pK, b * pK / z)
+                return out.transpose(1, 2).reshape(B, T, H * d)
             sh = pK + pC
             denom = b * pK + pC
             new_pK = torch.where(denom > 1e-12, sh * b * pK / denom.clamp_min(1e-12), pK)
@@ -296,10 +348,7 @@ class GeiruKeystoneAttention:
             out = (out.float() + delta * (oK.float() - oC.float())).to(out.dtype)
             if not stats["logged"]:
                 stats["logged"] = True
-                logging.info("[%s] balance x%.2f: keystone rows %d, context rows %d; block %s mean shares "
-                             "keystone %.4f -> %.4f, context %.4f -> %.4f (rest unchanged %.4f)",
-                             WHO, b, ki.numel(), ci.numel(), blk, float(pK.mean()), float(new_pK.mean()),
-                             float(pC.mean()), float((sh - new_pK).mean()), float((1 - sh).mean()))
+                log_shares(blk, ki, pK, new_pK, pC, sh - new_pK)
             return out.transpose(1, 2).reshape(B, T, H * d)
 
         # 3) this node's own attention forward on its blocks. It replaces whatever attention forward is there (H3's,
@@ -321,9 +370,9 @@ class GeiruKeystoneAttention:
                 pref = getattr(attn, "comfy_attention", None) if stock else None
                 kw = {"preferred_attention": pref} if pref is not None else {}
 
-                def own(qg, kg, vg):
+                def own(qg, kg, vg, mask=None):
                     h = qg.shape[1]
-                    o = comfy_attention.optimized_attention(qg, kg, vg, h, mask=None, skip_reshape=True,
+                    o = comfy_attention.optimized_attention(qg, kg, vg, h, mask=mask, skip_reshape=True,
                                                             transformer_options=topts, **kw)
                     return o.reshape(qg.shape[0], qg.shape[2], h, -1).transpose(1, 2)
 

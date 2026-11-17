@@ -46,6 +46,8 @@ import comfy.utils
 from .nodes import _split
 from .hybrid_keystone_attention import add_keystone_attention, parse_blocks, _ranges, LIGHTING_BLOCKS, BLOCK_MODES as KA_BLOCK_MODES
 
+KA_TAKE_FROM = ["context slice", "whole pie"]
+
 CATEGORY = "Geiru Context Suite"
 WHO = "Geiru Hybrid Windows"
 PROGRESS_DIR = "geiru_hybrid_progress"     # in ComfyUI's output folder
@@ -944,9 +946,24 @@ class H3ClownHybridWindows:
                                                               "the blend steps (there's no keystone there).",
                     "advanced": True}),
                 "balance": ("FLOAT", {"default": 20.0, "min": 0.0, "max": 100000.0, "step": 0.01, "round": 0.01,
-                                      "tooltip": "How hard the keystone pulls compared with the overlap. 1 = normal. "
-                                                 "The overlap gives up exactly what the keystone gains; the prompt, "
-                                                 "references, sound and new frames keep their normal share.",
+                                      "tooltip": "A weight on the keystone. 20 = each keystone token counts 20 times as "
+                                                 "much as it normally would when attention is shared out. 1 = off.\n"
+                                                 "context slice: shares out only between the keystone and the overlap, "
+                                                 "so 20 ends up as about 4x the keystone's normal attention (tops out "
+                                                 "around 6x).\n"
+                                                 "whole pie: shares out with everything, so 20 ends up as about 8x (no "
+                                                 "limit).\n"
+                                                 "Measured on the lighting blocks; varies by scene. The console shows the "
+                                                 "exact amount for your window when it starts.",
+                    "advanced": True}),
+                "take_from": (KA_TAKE_FROM, {"default": "context slice",
+                                             "tooltip": "Who gives up attention so the keystone can pull harder.\n"
+                                                        "context slice (default, recommended): only the overlap from the "
+                                                        "windows before gives it up; the prompt, references, audio and new "
+                                                        "frames keep their exact share. Holds the keystone's look best, at "
+                                                        "the cost of a slight sampling slowdown (about 5-10%).\n"
+                                                        "whole pie: everything gives up a little. Close to no speed cost "
+                                                        "on any attention, but holds the keystone's look less well.",
                     "advanced": True}),
                 "block_mode": (KA_BLOCK_MODES, {"default": "lighting blocks",
                                                 "tooltip": "lighting blocks = the 13 blocks found to carry brightness "
@@ -1005,7 +1022,7 @@ class H3ClownHybridWindows:
               split_conds_to_windows=False, detail_latent=None, finished_handoff=False, sound_first=False,
               context_noise=False, keystone_step=0, context_noise_strength=1.0, context_noise_fade="linear",
               crash_protection=True, keystone_attention=False, balance=20.0, block_mode="lighting blocks",
-              blocks=LIGHTING_BLOCKS, **_old):
+              blocks=LIGHTING_BLOCKS, take_from="context slice", **_old):
         if not _supported(model.model):
             raise RuntimeError(f"{WHO} needs a newer ComfyUI with MiniMax H3 context windows (PR #17425). Update ComfyUI.")
         length = _video_latent_t(context_length)
@@ -1038,7 +1055,9 @@ class H3ClownHybridWindows:
         m.model_options["context_handler"] = handler
         ka_blocks = parse_blocks(LIGHTING_BLOCKS if block_mode == "lighting blocks" else blocks)
         ka_on = bool(keystone_attention) and bool(keystone_swap) and abs(float(balance) - 1.0) > 1e-6 and bool(ka_blocks)
-        handler.ka_settings = {"keystone_attention": ka_on, "balance": float(balance), "blocks": _ranges(ka_blocks)}
+        ka_whole = str(take_from).strip().lower().startswith("whole")
+        handler.ka_settings = {"keystone_attention": ka_on, "balance": float(balance), "blocks": _ranges(ka_blocks),
+                               "take_from": "whole pie" if ka_whole else "context slice"}
         if keystone_attention and not keystone_swap:
             print(f"[{WHO}] keystone_attention needs keystone_swap on - left off")
         if ka_on:
@@ -1051,7 +1070,7 @@ class H3ClownHybridWindows:
                 if _h.capstone is not None and lt == _h.ka_len + 1:
                     out.append(lt - 1)               # window 1's capstone, tacked on the back (locked)
                 return out
-            m = add_keystone_attention(m, float(balance), ka_blocks, anchors)
+            m = add_keystone_attention(m, float(balance), ka_blocks, anchors, whole=ka_whole)
         if handler.back_capstone:
             m.set_model_unet_function_wrapper(_make_capstone_wrapper(handler, m.model_options.get("model_function_wrapper")))
         cw.create_prepare_sampling_wrapper(m)
@@ -1067,7 +1086,8 @@ class H3ClownHybridWindows:
               + (f", context noise {float(context_noise_strength):.2f} {handler.context_noise_fade}"
                  if handler.context_noise > 0 else "")
               + (", crash protection" if crash_protection else "")
-              + (f", keystone attention x{float(balance):g} on {_ranges(ka_blocks)}" if ka_on else ""))
+              + (f", keystone attention x{float(balance):g} ({'whole pie' if ka_whole else 'context slice'}) on "
+                 f"{_ranges(ka_blocks)}" if ka_on else ""))
         return (m,)
 
 
