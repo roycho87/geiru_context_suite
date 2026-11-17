@@ -13,12 +13,55 @@ import types
 import torch
 import torch.nn.functional as F
 
+import comfy.ldm.modules.attention as comfy_attention
 import comfy.model_management
 import comfy.patcher_extension
 import comfy.quant_ops
 
 WHO = "Geiru Hybrid Windows: keystone attention"
 KEY = "geiru_hybrid_keystone_attention"
+
+
+# Which ways of doing the balanced attention work on this machine: None = not tried yet, True / False once known.
+_WORKS = {"sage": None, "own": None, "torch": None}
+
+
+def _torch_lse(q, k, v, scale):
+    """PyTorch's memory-efficient attention kernel, which also returns each row's log-sum-exp. q, k, v: [B, H, T, D]."""
+    o, lse = torch.ops.aten._scaled_dot_product_efficient_attention(q, k, v, None, True, 0.0, False, scale=scale)[:2]
+    return o, lse.float()[..., :q.shape[2]]
+
+
+def _sage_lse(q, k, v, scale):
+    """Sage attention that also returns each row's log-sum-exp (natural log, of the scaled scores)."""
+    from sageattention import sageattn
+    o, lse = sageattn(q, k, v, tensor_layout="HND", is_causal=False, sm_scale=scale, return_lse=True)
+    return o, lse.float().reshape(q.shape[0], q.shape[1], -1)[..., :q.shape[2]]
+
+
+def _sage_plain(q, k, v):
+    """Plain Sage attention, for cards where Sage can't return the log-sum-exp. q, k, v and the output: [B, H, T, D]."""
+    from sageattention import sageattn
+    return sageattn(q, k, v, tensor_layout="HND", is_causal=False)
+
+
+def _try(name, what, fn):
+    """Run one way of doing the balanced attention. The first time it fails it's switched off (and the next way is
+    used); once it has worked, a later error is a real one and is raised."""
+    if _WORKS[name] is False:
+        return None
+    try:
+        r = fn()
+    except Exception as exc:
+        if _WORKS[name]:
+            raise
+        _WORKS[name] = False
+        logging.info("[%s] %s doesn't work here (%s), using the next way", WHO, what, exc)
+        return None
+    if _WORKS[name] is None:
+        _WORKS[name] = True
+        logging.info("[%s] balanced attention: %s", WHO, what)
+    return r
 
 
 class _Skip(Exception):
@@ -131,13 +174,54 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         state["cache"][ck] = res
         return res
 
-    # 2) the balanced attention, for one head group: q, k, v are [1, h, T, D]
-    def balanced(qb, kb, vb, ki, ci, blk):
+    # 2) the balanced attention, for one head group: q, k, v are [1, h, T, D]. Whichever way is used, it needs
+    #    the normal output, each token's keystone share and context share, and what the keystone and the context
+    #    each contribute (two small passes over only those keys). The ways, fastest that fits first:
+    #    - "sage": where Sage is this block's attention. One Sage pass that also returns each row's log-sum-exp;
+    #      the shares are exp(log-sum-exp of that part - log-sum-exp of everything).
+    #    - "own": any other attention the model is set to (PyTorch, Comfy Kitchen, ...). That attention runs
+    #      twice: the normal pass, and once more over two marker channels, which reads the shares straight out.
+    #    - "torch": PyTorch's memory-efficient kernel for everything (it returns the log-sum-exp too).
+    #    - the old way: PyTorch attention with two extra value channels. Works everywhere, slowest.
+    def balanced(qb, kb, vb, ki, ci, blk, route="torch", own=None):
         d = qb.shape[-1]
         scale = d ** -0.5
         B, H, T, _ = qb.shape
         S_len = kb.shape[2]
-        # full pass, two extra value channels = keystone share and context share
+        kK, vK = kb.index_select(2, ki), vb.index_select(2, ki)
+        kC, vC = kb.index_select(2, ci), vb.index_select(2, ci)
+
+        def with_lse(main):
+            out, lse = main()
+            oK, lseK = _torch_lse(qb, kK, vK, scale)
+            oC, lseC = _torch_lse(qb, kC, vC, scale)
+            return out, oK, oC, torch.exp(lseK - lse).unsqueeze(-1), torch.exp(lseC - lse).unsqueeze(-1)
+
+        def with_own():
+            out = own(qb, kb, vb)
+            mark = vb.new_zeros(B, H, S_len, d)
+            mark[:, :, ki, 0] = 1.0
+            mark[:, :, ci, 1] = 1.0
+            shares = own(qb, kb, mark)
+            del mark
+            pK = shares[..., 0:1].float().clamp_(0.0, 1.0)
+            pC = shares[..., 1:2].float().clamp_(0.0, 1.0)
+            del shares
+            oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
+            oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+            return out, oK, oC, pK, pC
+
+        r = None
+        if route == "sage":
+            r = _try("sage", "Sage", lambda: with_lse(lambda: _sage_lse(qb, kb, vb, scale)))
+        if r is None and own is not None and route in ("sage", "own"):
+            r = _try("own", "the attention the model is set to", with_own)
+        if r is None:
+            r = _try("torch", "PyTorch's memory-efficient kernel", lambda: with_lse(lambda: _torch_lse(qb, kb, vb, scale)))
+        if r is not None:
+            out, oK, oC, pK, pC = r
+            return finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d)
+        # the old way: full pass, two extra value channels = keystone share and context share
         ind = vb.new_zeros(S_len, 2)
         ind[ki, 0] = 1.0
         ind[ci, 1] = 1.0
@@ -148,9 +232,11 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         pK = full[..., d:d + 1].float()
         pC = full[..., d + 1:d + 2].float()
         del full, v2
-        # what the keystone part and the context part each contribute (attention over only those keys)
-        oK = F.scaled_dot_product_attention(qb, kb.index_select(2, ki), vb.index_select(2, ki), scale=scale)
-        oC = F.scaled_dot_product_attention(qb, kb.index_select(2, ci), vb.index_select(2, ci), scale=scale)
+        oK = F.scaled_dot_product_attention(qb, kK, vK, scale=scale)
+        oC = F.scaled_dot_product_attention(qb, kC, vC, scale=scale)
+        return finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d)
+
+    def finish(out, oK, oC, pK, pC, ki, ci, blk, B, T, H, d):
         sh = pK + pC
         denom = b * pK + pC
         new_pK = torch.where(denom > 1e-12, sh * b * pK / denom.clamp_min(1e-12), pK)
@@ -167,7 +253,32 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
     # 3) this node's own attention forward on its blocks. It replaces whatever attention forward is there (H3's,
     #    Kijai's low VRAM or Sage patches, ...), but only acts on calls where the balance applies; every other call
     #    goes to that previous forward untouched. Takes the input as a tensor or as Kijai's one-item list.
-    def make_forward(prev, blk):
+    def make_forward(prev, blk, stock):
+        prev_fn = getattr(prev, "__func__", prev)
+        prev_sage = "sage" in getattr(prev_fn, "__name__", "").lower()                 # Kijai's Sage patch
+        through_comfy = stock or bool(getattr(prev_fn, "_uses_optimized_attention", False))  # H3's own / low VRAM
+
+        def how(attn, topts):
+            """Which attention this block would use without this node -> (route, own attention or None)."""
+            if prev_sage:
+                # a Sage patch (Kijai's, the AMD one): Sage with the log-sum-exp when that works on this card,
+                # else plain Sage twice
+                return "sage", _sage_plain
+            if not through_comfy:
+                return "torch", None                 # some other attention patch: can't call it, so PyTorch
+            pref = getattr(attn, "comfy_attention", None) if stock else None
+            kw = {"preferred_attention": pref} if pref is not None else {}
+
+            def own(qg, kg, vg):
+                h = qg.shape[1]
+                o = comfy_attention.optimized_attention(qg, kg, vg, h, mask=None, skip_reshape=True,
+                                                        transformer_options=topts, **kw)
+                return o.reshape(qg.shape[0], qg.shape[2], h, -1).transpose(1, 2)
+
+            picked = "optimized_attention_override" in topts or getattr(pref, "function", None) is not None
+            default = getattr(comfy_attention.optimized_attention, "__name__", "")
+            return ("sage" if not picked and default == "attention_sage" else "own"), own
+
         def forward(self, x, rope_freqs=None, transformer_options={}):
             topts = transformer_options if isinstance(transformer_options, dict) else {}
             state = topts.get(KEY)
@@ -208,11 +319,12 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
             # head groups keep the memory down (heads are independent, so the result is the same);
             # follows Kijai's low VRAM head_chunks when it's set
             n = max(1, min(int(topts.get("minimax_head_chunks", 4) or 4), self.heads))
+            route, own = how(self, topts)
             out = torch.empty((s_len, self.heads * self.head_dim), dtype=dtype, device=device)
             hs = 0
             for size in [self.heads // n + (1 if i < self.heads % n else 0) for i in range(n)]:
                 he = hs + size
-                o = balanced(q[:, hs:he], k[:, hs:he], v[:, hs:he], ki, ci, blk)
+                o = balanced(q[:, hs:he], k[:, hs:he], v[:, hs:he], ki, ci, blk, route, own)
                 out[:, hs * self.head_dim:he * self.head_dim] = o.squeeze(0)
                 hs = he
             del q, k, v
@@ -231,11 +343,12 @@ def add_keystone_attention(m, balance, chosen, anchors_fn):
         attn = h3_blocks[i].attn
         key_name = f"diffusion_model.blocks.{i}.attn.forward"
         prev = m.object_patches.get(key_name)
-        if prev is not None:
+        stock = prev is None
+        if not stock:
             others.add(getattr(getattr(prev, "__func__", prev), "__name__", "patch"))
         else:
             prev = types.MethodType(type(attn).forward, attn)
-        m.add_object_patch(key_name, types.MethodType(make_forward(prev, i), attn))
+        m.add_object_patch(key_name, types.MethodType(make_forward(prev, i, stock), attn))
     if others:
         print(f"[{WHO}] sits on top of the attention patch already on those blocks ({', '.join(sorted(others))}); "
               f"it takes over only where the balance applies")
