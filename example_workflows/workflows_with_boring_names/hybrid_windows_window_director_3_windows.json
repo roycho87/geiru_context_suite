@@ -2368,6 +2368,51 @@
           "link": null
         },
         {
+          "localized_name": "keystone_attention",
+          "name": "keystone_attention",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "keystone_attention"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "balance",
+          "name": "balance",
+          "type": "FLOAT",
+          "widget": {
+            "name": "balance"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "take_from",
+          "name": "take_from",
+          "type": "COMBO",
+          "widget": {
+            "name": "take_from"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "block_mode",
+          "name": "block_mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "block_mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "blocks",
+          "name": "blocks",
+          "type": "STRING",
+          "widget": {
+            "name": "blocks"
+          },
+          "link": null
+        },
+        {
           "localized_name": "back_capstone",
           "name": "back_capstone",
           "shape": 7,
@@ -2466,6 +2511,11 @@
         true,
         true,
         0,
+        false,
+        20,
+        "context slice",
+        "lighting blocks",
+        "31-33, 36-44, 47",
         true,
         4,
         false,

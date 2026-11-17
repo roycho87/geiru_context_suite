@@ -2589,6 +2589,15 @@
             "name": "enabled"
           },
           "link": null
+        },
+        {
+          "localized_name": "take_from",
+          "name": "take_from",
+          "type": "COMBO",
+          "widget": {
+            "name": "take_from"
+          },
+          "link": null
         }
       ],
       "outputs": [
@@ -2608,7 +2617,8 @@
         20,
         "lighting blocks",
         "31-33, 36-44, 47",
-        true
+        true,
+        "context slice"
       ]
     }
   ],
