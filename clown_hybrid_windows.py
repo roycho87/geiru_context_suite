@@ -407,11 +407,55 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
     counter = {"n": 0, "pass": 0}
     guess = {}
 
-    def full_view(t, c):
+    _dir = (extra_args.get("model_options") or {}).get("geiru_window_director")
+    # the live preview: plain Hybrid Windows shows the whole video, the rest filled in with the windows made so far.
+    # Window Director: "this window" shows just the window, "all windows so far" shows the start of the video up to
+    # the end of this window (the windows made so far plus this one), so nothing that isn't made yet is shown
+    fill_preview = _dir is None or _dir.get("preview") == "all windows so far"
+    so_far = _dir is not None and _dir.get("preview") == "all windows so far"
+
+    def raw_callback():
+        """The preview callback under ComfyUI's wrapper. The wrapper splits video and sound with the full-length
+        sizes, so a shorter preview has to skip it. None if it can't be found (then the full length is used)."""
+        if not multi:
+            return callback
+        code, clo = getattr(callback, "__code__", None), getattr(callback, "__closure__", None)
+        if code is None or not clo or "packed_callback" not in code.co_freevars:
+            return None
+        return clo[code.co_freevars.index("packed_callback")].cell_contents
+
+    inner_cb = None if _dir is None or callback is None else raw_callback()
+
+    def window_view(t, c, wi, bg=None):
+        """Window Director's previews, as ComfyUI's previews take them: just the window, or (bg given) from the
+        start of the video up to the end of the window, the part before it taken from bg (the windows made so far)."""
+        if c is not None:
+            spans = c["spans"]
+            parts = list(comfy.utils.unpack_latents(t, c["shapes"])) if multi else [t]
+        else:
+            spans = crop_spans(wi) if wi is not None else None
+            if spans is None:
+                return None
+            parts = cut(list(comfy.utils.unpack_latents(t, shapes)) if multi else [t], spans)
+        if bg is not None:
+            out = []
+            for mi, (p, (a, b)) in enumerate(zip(parts, spans)):
+                if tuple(bg[mi].shape) != tuple(shapes[mi]):
+                    return None
+                f = bg[mi].narrow(dims[mi], 0, b).to(device=p.device, dtype=p.dtype, copy=True)
+                f.narrow(dims[mi], a, b - a).copy_(p)
+                out.append(f)
+            parts = out
+        return comfy.nested_tensor.NestedTensor(parts) if multi else parts[0]
+
+    def full_view(t, c, bg=None):
         ps = list(comfy.utils.unpack_latents(t, c["shapes"])) if multi else [t]
         full = []
         for mi, (p, (a, b)) in enumerate(zip(ps, c["spans"])):
-            f = torch.zeros(tuple(c["full_shapes"][mi]), dtype=p.dtype, device=p.device)
+            if bg is not None and tuple(bg[mi].shape) == tuple(c["full_shapes"][mi]):
+                f = bg[mi].to(device=p.device, dtype=p.dtype, copy=True)
+            else:
+                f = torch.zeros(tuple(c["full_shapes"][mi]), dtype=p.dtype, device=p.device)
             f.narrow(dims[mi], a, b - a).copy_(p)
             full.append(f)
         return comfy.utils.pack_latents(full)[0] if multi else full[0]
@@ -427,11 +471,19 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
                 cap.append(take(x) if take is not None else x.detach().clone())
             if callback is not None:
                 c = h.crop
+                if inner_cb is not None:
+                    # Window Director: only the window, or everything made so far
+                    bx0, bx = (pins, st) if so_far else (None, None)
+                    v0, v = window_view(x0, c, h.only_window, bx0), window_view(x, c, h.only_window, bx)
+                    if v0 is not None and v is not None:
+                        inner_cb(offset + step, v0, v, total_all)
+                        return
                 if c is None:
                     callback(offset + step, x0, x, total_all)
                 else:
                     # a cropped pass: previews expect the full length, so hand them the window in its place
-                    callback(offset + step, full_view(x0, c), full_view(x, c), total_all)
+                    bx0, bx = (pins, st) if fill_preview else (None, None)
+                    callback(offset + step, full_view(x0, c, bx0), full_view(x, c, bx), total_all)
         return cb
 
     def crop_spans(wi):

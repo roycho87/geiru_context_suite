@@ -152,6 +152,8 @@ It renders the whole video in one go, in overlapping windows:
 
 GPU memory stays the size of one window however long the video is: the full-length copies wait in system RAM, and each window's own steps run on just that window. With keystone and capstone off, it works like plain hybrid windows.
 
+The live preview loops the whole video: the windows already made, the window being made (updating as it goes), and grey for the part not made yet.
+
 It's meant for scenes with fast motion that need to be seamless, not to beat the chain nodes at preventing degradation. Use at least two blend steps with `finished_handoff` on (for example `switch_step` 6 of 8). Plug the model through it to the guider. Update ComfyUI if the node is missing.
 
 | Setting | Meaning |
@@ -212,7 +214,7 @@ The strip has one square per window: **green** = approved, **yellow** = ready to
 | `new_seed_on_reroll` | Off: a re-roll uses the same noise, so it only changes if you change the prompt or seed. On: fresh noise. |
 | 🎈 `keep_late_steps` | With `finished_handoff` on, also saves each window's steps after `switch_step`, so you can raise `switch_step` later and **Blend all** starts from there without making the windows again. Uses more disk space. |
 | `bypass_blend` | The last button becomes **Join all**: the windows joined as approved. Use it with `finished_handoff` on. |
-| `preview` | **this window** (with its overlap with the one before) or **all windows so far**. |
+| `preview` | What the live preview loops while a window renders. **this window**: just the window being made (with its overlap with the one before). **all windows so far**: from the start of the video to the end of the window being made. Neither shows the part not made yet. |
 
 - Keep `finished_handoff` on, so each window builds on the finished window you approved.
 - You can change a window's prompt, and the protection settings (keystone, keystone attention, capstone, context noise, fuse method, freenoise), between windows. Changing a 🎈 setting stops the run with a message: set it back or press **Reset**. The one exception: raising `switch_step` once every window is made, with `keep_late_steps` on.
