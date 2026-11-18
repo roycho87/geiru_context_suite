@@ -205,6 +205,7 @@ model → Geiru Hybrid Windows → Geiru Window Director → guider / sampler �
 | **Approve** | Keeps this window and makes the next one. |
 | **Run/Re-roll** | Makes the current window again (fresh noise when `new_seed_on_reroll` is on). |
 | **Rewind to selected** | Goes back to the window you clicked in the strip and makes it again. Later windows are dropped. |
+| **Replace selected** | Once every window is made: makes only the window you clicked again, between its neighbours. The windows after it are kept. |
 | **Direct** | Approves on a loop until every window is made, or until Stop. |
 | **Blend all** | Once every window is made, runs the blended last steps over the whole video. With `bypass_blend` on it's **Join all** (no blend). |
 | **Reset** | Clears this run's saved windows. |
@@ -217,9 +218,11 @@ The strip has one square per window: **green** = approved, **yellow** = ready to
 | `new_seed_on_reroll` | Off: a re-roll uses the same noise, so it only changes if you change the prompt or seed. On: fresh noise. |
 | 🎈 `keep_late_steps` | With `finished_handoff` on, also saves each window's steps after `switch_step`, so you can raise `switch_step` later and **Blend all** starts from there without making the windows again. Uses more disk space. |
 | `bypass_blend` | The last button becomes **Join all**: the windows joined as approved. Use it with `finished_handoff` on. |
+| `replace_free_tail` | **Replace selected** only. Off: the frames the window hands to the next one are kept too, so only its own middle is made again. On: those frames are made again as well; the next window is then marked stale and **Blend all** waits until it has been replaced too. |
 | `preview` | What the live preview loops while a window renders. **this window**: just the window being made (with its overlap with the one before). **all windows so far**: from the start of the video to the end of the window being made. Neither shows the part not made yet. |
 
 - Keep `finished_handoff` on, so each window builds on the finished window you approved.
+- **Replace selected** works because a window re-makes only the latents that aren't marked done and holds the rest, wherever they sit. Replace marks both the frames before the window and the overlap it hands on as done, so the new middle is pinned at both ends, picture and sound. Anything said or done inside those held frames can't change: write the new middle so it arrives there. The old window file is kept beside the new one as `window_NNN.before-replace-K.bak`. Window 1 can't be replaced, since every later window was made with its keystone.
 - You can change a window's prompt, and the protection settings (keystone, keystone attention, capstone, context noise, fuse method, freenoise), between windows. Changing a 🎈 setting stops the run with a message: set it back or press **Reset**. The one exception: raising `switch_step` once every window is made, with `keep_late_steps` on.
 
 ## Example workflows
