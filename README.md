@@ -211,6 +211,14 @@ model → Geiru Hybrid Windows → Geiru Window Director → guider / sampler �
 
 The strip has one square per window: **green** = approved, **yellow** = ready to look at, **pulsing blue** = rendering, **dark** = not made yet.
 
+Each made window's square shows its first frame. **Hover over it to play the window** (with its overlap with the one before). Every square takes the video's shape.
+
+![Window Director's strip: window 2 playing on hover](media/window_director_previews.png)
+
+- These are rough previews, made straight from the latents the same way ComfyUI's quick sampler preview makes one: no VAE, nothing to wire, and they show up whatever your preview settings are. They're blurry with approximate colours; the real video is what your VAE decode makes.
+- About a second per window, on the CPU, and a few hundred KB on disk. Saved next to the windows as `window_NNN_thumb.png` and `.webp`.
+- **Reset** deletes them with the run, **Rewind** deletes them from the chosen window on, and a re-roll replaces that window's. Takes made before 1.1.11 get theirs the next time those windows load.
+
 | Setting | |
 |---|---|
 | `run_name` | Each name keeps its own windows in `output/geiru_window_director/<run_name>/`, so you can start a new take without losing the old one, or pick one back up after a restart. |
