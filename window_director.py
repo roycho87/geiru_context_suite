@@ -20,7 +20,7 @@ import torch
 CATEGORY = "Geiru Context Suite"
 WHO = "Geiru Window Director"
 DIR = "geiru_window_director"          # in ComfyUI's output folder
-ACTIONS = ["reroll", "approve", "rewind", "blend"]
+ACTIONS = ["reroll", "approve", "rewind", "blend", "replace"]
 PREVIEWS = ["this window", "all windows so far"]
 EVENT = "geiru_window_director.status"
 
@@ -256,7 +256,7 @@ def run_directed(d, api, state):
                 keys["cap"] = None if w.get("cap") is None else w["cap"].to(device=dev, dtype=dt)
             keys["pass"] = int(w.get("pass", 0))
 
-    def render(wi, reroll):
+    def render(wi, reroll, merge=None):
         t = wi + 1
         idxs = windows[wi]
         new = [[i for i in per_window[wi][mi] if i not in done[mi]] for mi in range(len(shapes))]
@@ -347,6 +347,41 @@ def run_directed(d, api, state):
                     continue
                 late[str(si)] = x                     # already just this window's latents, in system RAM
             save["late"] = late
+        if merge is not None:
+            # Replace: this pass may have re-made only part of the window. The file must still hold every frame the
+            # window owns (its tail is what the next window is pinned to), so write those from the full state.
+            own = merge["idx"]
+            full = {"idx": own, "st": [], "pins": [], "preview": [], "pass": int(merge.get("pass", counter["pass"]))}
+            for mi in range(len(shapes)):
+                if own[mi]:
+                    sl = ix(dims[mi], own[mi])
+                    full["st"].append(st[mi][sl].detach().cpu())
+                    full["pins"].append(pins[mi][sl].detach().cpu())
+                    full["preview"].append(preview[mi][sl].detach().cpu())
+                else:
+                    full["st"].append(torch.zeros(0))
+                    full["pins"].append(torch.zeros(0))
+                    full["preview"].append(torch.zeros(0))
+            for key in ("key", "cap"):
+                if key in merge:
+                    full[key] = merge[key]
+            old_late, new_late = merge.get("late") or {}, save.get("late") or {}
+            if old_late:
+                late = {}
+                for si, parts in old_late.items():
+                    row = []
+                    for mi in range(len(shapes)):
+                        if not own[mi]:
+                            row.append(torch.zeros(0))
+                            continue
+                        tmp = st[mi].detach().cpu().clone()
+                        tmp[ix(dims[mi], own[mi])] = parts[mi].to(tmp.dtype)
+                        if si in new_late and new[mi]:
+                            tmp[ix(dims[mi], new[mi])] = new_late[si][mi].to(tmp.dtype)
+                        row.append(tmp[ix(dims[mi], own[mi])].clone())
+                    late[si] = row
+                full["late"] = late
+            save = full
         p = _win_path(folder, t)
         torch.save(save, p + ".tmp")
         os.replace(p + ".tmp", p)
@@ -378,6 +413,11 @@ def run_directed(d, api, state):
     rerolls = meta.setdefault("rerolls", {})
 
     if action == "blend":
+        if meta.get("stale"):
+            msg = (f"window(s) {meta['stale']} were built on frames that have since been replaced - replace them "
+                   f"before Blend all")
+            _send(_status(meta, name, msg))
+            raise RuntimeError(f"{WHO}: {msg}.")
         if pending:
             approved, pending = max(approved, pending), 0
         if approved < n:
@@ -434,6 +474,57 @@ def run_directed(d, api, state):
         _write_meta(folder, meta)
         _send(_status(meta, name, "blended"))
         return result
+
+    if action == "replace":
+        target = max(1, min(int(d.get("window", 1)), n))
+        if pending:
+            approved, pending = max(approved, pending), 0
+        if approved < n:
+            msg = f"windows made: {approved} of {n} - Replace needs every window made first (use Rewind instead)"
+            _send(_status(meta, name, msg))
+            raise RuntimeError(f"{WHO}: {msg}.")
+        if target == 1:
+            msg = "window 1 sets the keystone every later window was made with - it can't be replaced on its own"
+            _send(_status(meta, name, msg))
+            raise RuntimeError(f"{WHO}: {msg}.")
+        load_upto(n)
+        wi = target - 1
+        old = torch.load(_win_path(folder, target), map_location="cpu", weights_only=True)
+        free_tail = bool(d.get("free_tail", False)) and wi + 1 < n
+        nxt = ([set(per_window[wi + 1][mi]) for mi in range(len(shapes))] if (wi + 1 < n and not free_tail)
+               else [set() for _ in shapes])
+        redo = [[i for i in old["idx"][mi] if i not in nxt[mi]] for mi in range(len(shapes))]
+        if not redo[0]:
+            raise RuntimeError(f"{WHO}: window {target} has no frames of its own to re-make.")
+        rerolls[str(target)] = int(rerolls.get(str(target), 0)) + (1 if d.get("new_seed", True) else 0)
+        reroll = rerolls[str(target)]
+        fresh0 = unpack(ms.noise_scaling(sigmas[0], api["noise"], api["latent_image"]))
+        for mi in range(len(shapes)):
+            if redo[mi]:
+                sl = ix(dims[mi], redo[mi])
+                st[mi][sl] = fresh0[mi][sl].to(device=st[mi].device, dtype=st[mi].dtype)
+                done[mi].difference_update(redo[mi])
+        del fresh0
+        prev = torch.load(_win_path(folder, target - 1), map_location="cpu", weights_only=True)
+        keys["pass"] = int(prev.get("pass", 0))
+        del prev
+        count = int(meta.get("replaced", 0)) + 1
+        backup = os.path.join(folder, f"window_{target:03d}.before-replace-{count}.bak")
+        shutil.copyfile(_win_path(folder, target), backup)
+        held = [len([i for i in per_window[wi][mi] if i in done[mi]]) for mi in range(len(shapes))]
+        logging.info(f"[{WHO}] '{name}': replace window {target} of {n}: re-making {[len(r) for r in redo]} latents"
+                     f"{' (hand-over included)' if free_tail else ''}, {held} held from its neighbours; the old window "
+                     f"is kept as {os.path.basename(backup)}")
+        render(wi, reroll, merge=old)
+        stale = [t for t in meta.get("stale", []) if t != target]
+        if free_tail and target + 1 not in stale:
+            stale.append(target + 1)
+        meta.update(approved=n, pending=0, blended=False, replaced=count, stale=sorted(stale))
+        _write_meta(folder, meta)
+        msg = (f"window {target} of {n} replaced" + (f"; window(s) {sorted(stale)} sit on old frames and must be replaced "
+               f"next" if stale else " between its neighbours - look at it, then Blend all"))
+        _send(_status(meta, name, msg))
+        return made_so_far(wi)
 
     if action == "approve":
         if pending:
@@ -519,6 +610,12 @@ class GeiruWindowDirector:
                                                   "always gives the whole video."}),
                 "action": (ACTIONS, {"default": "reroll", "tooltip": "Set by the buttons."}),
             },
+            "optional": {
+                "replace_free_tail": ("BOOLEAN", {"default": False,
+                                                  "tooltip": "Replace only: also re-make the frames this window hands "
+                                                             "to the next one. The next window must then be replaced "
+                                                             "too."}),
+            },
         }
 
     @classmethod
@@ -528,7 +625,7 @@ class GeiruWindowDirector:
     def patch(self, model, run_name="take1", rewind_to_window=1, new_seed_on_reroll=False, keep_late_steps=False,
               bypass_blend=False,
               preview=PREVIEWS[0],
-              action="reroll"):
+              action="reroll", replace_free_tail=False):
         h = model.model_options.get("context_handler", None)
         if h is None or type(h).__name__ != "ClownContextHandler" or not hasattr(h, "switch_step"):
             raise RuntimeError(f"{WHO}: plug the model from Geiru Hybrid Windows into this node.")
@@ -537,8 +634,9 @@ class GeiruWindowDirector:
                                                     "new_seed": bool(new_seed_on_reroll), "action": action,
                                                     "preview": preview if preview in PREVIEWS else PREVIEWS[0],
                                                     "bypass_blend": bool(bypass_blend),
-                                                    "keep_late_steps": bool(keep_late_steps)}
-        print(f"[{WHO}] '{run_name}': {action}" + (f" to window {rewind_to_window}" if action == "rewind" else ""))
+                                                    "keep_late_steps": bool(keep_late_steps),
+                                                    "free_tail": bool(replace_free_tail)}
+        print(f"[{WHO}] '{run_name}': {action}" + (f" window {rewind_to_window}" if action in ("rewind", "replace") else ""))
         return (m,)
 
 
