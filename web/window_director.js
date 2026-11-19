@@ -21,6 +21,16 @@ const CSS = `
 .gwd-sq.run{background:#5c8dd6;color:#fff;animation:gwdpulse 1.2s ease-in-out infinite;}
 @keyframes gwdpulse{0%,100%{opacity:1}50%{opacity:.45}}
 .gwd-sq.sel{outline:2px solid #fff;outline-offset:1px;}
+.gwd-sq.sz{flex:0 0 auto;min-width:0;max-width:none;border:2px solid transparent;}
+.gwd-sq.th{height:34px;max-width:56px;flex-basis:40px;text-align:left;padding:1px 3px;background-size:cover;background-position:center;color:#fff;text-shadow:0 0 3px #000,0 0 2px #000;border:2px solid #3a2430;}
+.gwd-sq.th,.gwd-sq.th.sz{line-height:normal !important;}
+.gwd-sq.th.sz{max-width:none;flex-basis:auto;}
+.gwd-sq.th.ok{border-color:#66bb6a;}
+.gwd-sq.th.cur{border-color:#ffca28;}
+.gwd-sq.th.run{border-color:#5c8dd6;}
+.gwd-pop{position:fixed;z-index:10000;pointer-events:none;border:2px solid #555;border-radius:4px;background:#111;box-shadow:0 4px 14px rgba(0,0,0,.6);}
+.gwd-pop img{display:block;width:256px;height:auto;}
+.gwd-pop div{font:11px sans-serif;color:#ddd;padding:2px 4px;}
 `;
 const TITLE_PINK = "#c2407a";
 const BODY_PINK = "#6e2347";
@@ -53,6 +63,33 @@ function hideWidget(w) {
 
 let live = null;      // the Director node whose render is running
 
+// little previews: each made window's square shows its first frame, and hovering plays the window
+const thumbURL = (node, i, kind, v) =>
+  api.apiURL(`/geiru_window_director/thumb?run=${encodeURIComponent(runName(node))}&t=${i}&kind=${kind}&v=${v}`);
+let pop = null;
+function hidePop() { if (pop) { pop.remove(); pop = null; } }
+function showPop(node, i, v, e) {
+  hidePop();
+  pop = document.createElement("div");
+  pop.className = "gwd-pop";
+  const img = document.createElement("img");
+  img.src = thumbURL(node, i, "webp", v);
+  const cap = document.createElement("div");
+  cap.textContent = `window ${i} (rough preview)`;
+  pop.append(img, cap);
+  document.body.appendChild(pop);
+  movePop(e);
+}
+function movePop(e) {
+  if (!pop) return;
+  const w = 262, h = pop.offsetHeight || 220;
+  let x = e.clientX + 16, y = e.clientY + 16;
+  if (x + w > window.innerWidth) x = e.clientX - w - 16;
+  if (y + h > window.innerHeight) y = Math.max(4, e.clientY - h - 16);
+  pop.style.left = `${x}px`;
+  pop.style.top = `${y}px`;
+}
+
 function paint(node) {
   const g = node._gwd;
   if (!g) return;
@@ -60,6 +97,7 @@ function paint(node) {
   const total = s.total | 0, approved = s.approved | 0, pending = s.pending | 0;
   const sel = W(node, "rewind_to_window")?.value | 0;
   const made = Math.max(approved, pending);
+  hidePop();
   g.strip.innerHTML = "";
   if (!total) {
     const t = document.createElement("div");
@@ -72,6 +110,21 @@ function paint(node) {
       const run = g.awaiting && i === g.rendering;
       sq.className = "gwd-sq" + (run ? " run" : (i <= approved ? " ok" : (i === pending ? " cur" : ""))) + (i === sel ? " sel" : "");
       sq.textContent = i;
+      if (s.aspect > 0) {                 // every square at the video's shape, made or not
+        const hh = 34, ww = Math.max(20, Math.min(90, Math.round(hh * s.aspect)));
+        sq.classList.add("sz");
+        sq.style.width = `${ww}px`;
+        sq.style.height = `${hh}px`;
+        sq.style.lineHeight = `${hh - 4}px`;
+      }
+      const v = (s.thumbs || {})[String(i)];
+      if (v && i <= made) {
+        sq.classList.add("th");
+        sq.style.backgroundImage = `url("${thumbURL(node, i, "png", v)}")`;
+        sq.onmouseenter = (e) => showPop(node, i, v, e);
+        sq.onmousemove = movePop;
+        sq.onmouseleave = hidePop;
+      }
       sq.title = (run ? `window ${i}: rendering` : i <= approved ? `window ${i}: approved` : (i === pending ? `window ${i}: ready to look at` : `window ${i}: not made yet`))
                  + (i <= made ? " · click to select it for Rewind to selected" : "");
       sq.onclick = (e) => {

@@ -80,14 +80,80 @@ def _wipe(d):
 
 
 def _drop_from(d, t):
-    """Delete the saved windows t, t+1, ..."""
+    """Delete the saved windows t, t+1, ... and their little previews."""
     for f in os.listdir(d):
-        if f.startswith("window_") and f.endswith(".pt"):
+        if f.startswith("window_") and f.endswith((".pt", THUMB_PNG, THUMB_WEBP)):
             try:
                 if int(f[7:10]) >= t:
                     os.remove(os.path.join(d, f))
             except ValueError:
                 pass
+
+
+# ---------------------------------------------------------------- little previews for the strip
+
+THUMB_PNG = "_thumb.png"        # the window's first frame, shown in its square
+THUMB_WEBP = "_thumb.webp"      # the whole window, played when you hover over the square
+THUMB_W = 256                   # width in pixels
+_thumb_warned = []
+
+
+def _thumb_base(d, t):
+    return os.path.join(d, f"window_{t:03d}_thumb")
+
+
+def _thumbs(d):
+    """{window number: when its preview was saved}, so the page loads a new one after a re-roll."""
+    out = {}
+    try:
+        for f in os.listdir(d):
+            if f.startswith("window_") and f.endswith(THUMB_WEBP):
+                try:
+                    out[str(int(f[7:10]))] = int(os.path.getmtime(os.path.join(d, f)))
+                except ValueError:
+                    pass
+    except OSError:
+        pass
+    return out
+
+
+def _save_thumb(d, t, lat, fps=24.0):
+    """A rough preview of one window from its latents, the way ComfyUI's quick sampler preview makes one
+    (latent2rgb): no VAE, on the CPU, well under a second. Never stops the render if it goes wrong."""
+    try:
+        from PIL import Image
+        from comfy.latent_formats import MiniMaxH3Video as F
+        if lat is None or lat.ndim != 5 or lat.shape[2] == 0:
+            return
+        fac = torch.tensor(F.latent_rgb_factors, dtype=torch.float32).t()          # 3 x 24
+        bias = torch.tensor(F.latent_rgb_factors_bias, dtype=torch.float32)
+        x = lat[0, :fac.shape[1]].detach().to("cpu", torch.float32).permute(1, 2, 3, 0)   # T, H, W, C
+        rgb = torch.nn.functional.linear(x, fac, bias)                             # T, H, W, 3
+        rgb = ((rgb + 1.0) / 2.0).clamp(0, 1).permute(0, 3, 1, 2)
+        h = max(8, round(THUMB_W * rgb.shape[2] / max(1, rgb.shape[3])))
+        rgb = torch.nn.functional.interpolate(rgb, size=(h, THUMB_W), mode="bilinear", align_corners=False)
+        frames = (rgb.clamp(0, 1) * 255).round().to(torch.uint8).permute(0, 2, 3, 1).numpy()
+        imgs = [Image.fromarray(f) for f in frames]
+        base = _thumb_base(d, t)
+        imgs[0].save(base + ".tmp.png", format="PNG")
+        os.replace(base + ".tmp.png", base + ".png")
+        # one latent frame is 4 video frames (the first is 1), so play it at about the real speed
+        imgs[0].save(base + ".tmp.webp", format="WEBP", save_all=True, append_images=imgs[1:],
+                     duration=max(20, round(4000 / fps)), loop=0, quality=75)
+        os.replace(base + ".tmp.webp", base + ".webp")
+    except Exception as e:
+        if not _thumb_warned:
+            _thumb_warned.append(1)
+            logging.warning(f"[{WHO}] couldn't make the little window preview (the render is fine): {e}")
+
+
+def _aspect(meta):
+    """Width / height of the video the take is made at, so every square in the strip has the video's shape."""
+    try:
+        v = (meta.get("sig") or {}).get("shapes")[0]
+        return round(float(v[-1]) / float(v[-2]), 4) if v[-2] else None
+    except Exception:
+        return None
 
 
 def _status(meta, name, msg=""):
@@ -98,7 +164,8 @@ def _status(meta, name, msg=""):
     made = max(approved, pending)
     return {"run": _safe_name(name), "total": total, "approved": approved, "pending": pending,
             "all_made": bool(total) and made >= total, "blended": bool(meta.get("blended", False)),
-            "joined": bool(meta.get("joined", False)), "msg": msg}
+            "joined": bool(meta.get("joined", False)), "msg": msg,
+            "thumbs": _thumbs(_run_dir(name, make=False)), "aspect": _aspect(meta)}
 
 
 def _send(status):
@@ -181,6 +248,8 @@ def run_directed(d, api, state):
                 pins[mi][sl] = w["pins"][mi].to(device=pins[mi].device, dtype=pins[mi].dtype)
                 preview[mi][sl] = w["preview"][mi].to(device=preview[mi].device, dtype=preview[mi].dtype)
                 done[mi].update(new)
+            if not os.path.isfile(_thumb_base(folder, j) + ".webp"):     # a window saved before previews existed
+                _save_thumb(folder, j, preview[0][ix(dims[0], per_window[j - 1][0])])
             if j == 1:
                 dev, dt = st[0].device, st[0].dtype
                 keys["key"] = None if w.get("key") is None else w["key"].to(device=dev, dtype=dt)
@@ -281,6 +350,7 @@ def run_directed(d, api, state):
         p = _win_path(folder, t)
         torch.save(save, p + ".tmp")
         os.replace(p + ".tmp", p)
+        _save_thumb(folder, t, preview[0][ix(dims[0], per_window[wi][0])])     # the little preview in the strip
         del out, x0, fin, shown, capture
         api["free_vram"]()
 
@@ -483,6 +553,21 @@ try:
         name = request.query.get("run", "take1")
         d = _run_dir(name, make=False)
         return web.json_response(_status(_read_meta(d) if os.path.isdir(d) else None, name))
+
+    @PromptServer.instance.routes.get("/geiru_window_director/thumb")
+    async def _route_thumb(request):
+        name = request.query.get("run", "take1")
+        kind = request.query.get("kind", "png")
+        try:
+            t = int(request.query.get("t", "0"))
+        except ValueError:
+            t = 0
+        if t < 1 or kind not in ("png", "webp"):
+            return web.Response(status=400)
+        p = _thumb_base(_run_dir(name, make=False), t) + "." + kind
+        if not os.path.isfile(p):
+            return web.Response(status=404)
+        return web.FileResponse(p, headers={"Cache-Control": "no-cache"})
 
     @PromptServer.instance.routes.post("/geiru_window_director/reset")
     async def _route_reset(request):
