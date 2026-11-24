@@ -46,6 +46,18 @@ def _sage_plain(q, k, v):
     return sageattn(q, k, v, tensor_layout="HND", is_causal=False)
 
 
+def _under_sparse(override):
+    """ComfyUI's Model Sparse Attention puts its own attention override on the hook. Returns (it is that one,
+    the override that was there before it or None)."""
+    if not getattr(override, "__module__", "").endswith("nodes_sparse_attention"):
+        return False, None
+    try:
+        under = override.__closure__[override.__code__.co_freevars.index("previous")].cell_contents
+    except Exception:
+        under = None
+    return True, under
+
+
 def _try(name, what, fn):
     """Run one way of doing the balanced attention. The first time it fails it's switched off (and the next way is
     used); once it has worked, a later error is a real one and is raised."""
@@ -128,6 +140,41 @@ def add_keystone_attention(m, balance, chosen, anchors_fn, whole=False):
     b = float(balance)
     stats = {"logged": False}
 
+    # ComfyUI's Model Sparse Attention swaps a block's whole attention for its sparse one, which would skip this
+    # node. On model calls where the balance applies, this node's blocks run with their normal attention instead;
+    # every other block stays sparse.
+    def keep_dense(topts):
+        replace = topts.get("patches_replace")
+        dit = replace.get("dit") if isinstance(replace, dict) else None
+        if not dit:
+            return
+        new = None
+        for i in chosen:
+            fn = dit.get(("double_block", i))
+            if fn is None or getattr(fn, "_geiru_keeps_dense", False):
+                continue
+
+            def run(args, extra, _fn=fn):
+                original = extra["original_block"]
+
+                def plain(a):
+                    st = (a.get("transformer_options") or {}).get(KEY)
+                    if a.get("attention") is not None and st and st.get("on", True) and st.get("key") is not None:
+                        a = {k: v for k, v in a.items() if k != "attention"}
+                        if not stats.get("sparse_note"):
+                            stats["sparse_note"] = True
+                            logging.info("[%s] sparse attention is on: this node's blocks (%s) stay on normal "
+                                         "attention so the balance applies; the other blocks stay sparse",
+                                         WHO, _ranges(chosen))
+                    return original(a)
+                return _fn(args, {**extra, "original_block": plain})
+            run._geiru_keeps_dense = True
+            if new is None:
+                new = dict(dit)
+            new[("double_block", i)] = run
+        if new is not None:
+            topts["patches_replace"] = {**replace, "dit": new}
+
     # 1) wrapper: per model call, find the keystone rows and the context rows (video rows only)
     def wrapper(executor, x, timestep, context, transformer_options={}, *args, **kwargs):
         state = {"key": None, "ctx": None, "cache": {}, "on": True}
@@ -155,6 +202,11 @@ def add_keystone_attention(m, balance, chosen, anchors_fn, whole=False):
         except Exception as exc:
             logging.warning("[%s] could not read the noise mask: %s", WHO, exc)
         transformer_options[KEY] = state
+        if state["key"] is not None:
+            try:
+                keep_dense(transformer_options)
+            except Exception as exc:
+                logging.warning("[%s] could not keep its blocks off sparse attention: %s", WHO, exc)
         return executor(x, timestep, context, transformer_options, *args, **kwargs)
 
     m.add_wrapper_with_key(comfy.patcher_extension.WrappersMP.DIFFUSION_MODEL, KEY, wrapper)
@@ -302,6 +354,15 @@ def add_keystone_attention(m, balance, chosen, anchors_fn, whole=False):
                 return "sage", _sage_plain
             if not through_comfy:
                 return "torch", None                 # some other attention patch: can't call it, so PyTorch
+            override = topts.get("optimized_attention_override")
+            if override is not None:
+                sparse, under = _under_sparse(override)
+                if sparse:                           # this block stays dense: call what is under the sparse override
+                    topts = dict(topts)
+                    if under is None:
+                        topts.pop("optimized_attention_override", None)
+                    else:
+                        topts["optimized_attention_override"] = under
             pref = getattr(attn, "comfy_attention", None) if stock else None
             kw = {"preferred_attention": pref} if pref is not None else {}
 
