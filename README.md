@@ -236,13 +236,13 @@ I'm a clown and I'm ridiculous. My workflow names are equally so, so there's a f
 
 | Workflow | Boring name | What it is |
 |---|---|---|
+| **Easily Distracted Clown** | `long_chain_keystone_attention_and_context_noise` | **Current default for continuations.** Chain: Context Noise + Keystone (`keystone front`) + Keystone Attention. |
+| **Clown Biker Babe** | `hybrid_windows_window_director_8_windows` | **Current default for Hybrid Windows.** Window Director, 60 s in 8 windows, with context noise, keystone and Keystone Attention. |
 | Mad Clown Inventor | `long_chain_keystone_and_late_lock` | Chain: Keystone (`keystone front + capstone back`) + Late Lock. |
 | Noisy Clown | `long_chain_plus_context_noise` | Mad Clown Inventor + Context Noise (at 1). |
-| Easily Distracted Clown | `long_chain_keystone_attention_and_context_noise` | Chain: Context Noise + Keystone (`keystone front`) + Keystone Attention. |
 | Clown Coaster | `hybrid_windows_60_second_simple` | 60 s Hybrid Windows render, 8 windows, one prompt each. |
 | Clowns for Picard | `hybrid_windows_60_second_widescreen` | Clown Coaster in widescreen with `sound_first`. |
 | Clown Control Freak | `hybrid_windows_window_director_3_windows` | Window Director, 3 windows. |
-| Clown Biker Babe | `hybrid_windows_window_director_8_windows` | Window Director, 60 s in 8 windows. |
 | everyone_wants_a_piece_of_the_clown | `motion_context_chain_cntxt_and_anchors` | Motion Context chain with Context + Anchoring. |
 | withers_has_big_nattys | `static_vlog_odd_even_shots_cntxt_and_anchors` | Static vlog: odd shots fresh, even shots continue. |
 | sane_clown_combiner | `join_clips_into_one_video` | Joins 10 chain clips into one video. |
