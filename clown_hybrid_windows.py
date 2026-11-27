@@ -706,6 +706,7 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
                    pack=pack, unpack=unpack, run_win=run_win, one_window=one_window, keep=keep, counter=counter,
                    extra_args=extra_args, executor=executor, guider=guider, progress=progress,
                    disable_pbar=disable_pbar, nscale=nscale, ms=ms, latent_image=latent_image, noise=noise,
+                   denoise_mask=denoise_mask,
                    ix=_ix, free_vram=_free_vram, pass_args=_pass_args, who=WHO, model=model,
                    dev=work_dev, store=store, to_store=to_store,
                    unpack_view=(lambda t: list(comfy.utils.unpack_latents(t, shapes)) if multi else [t]),
@@ -780,9 +781,21 @@ def _hybrid(executor, guider, sigmas, extra_args, callback, noise, latent_image,
             result = pack(st).to(work_dev) / max(1.0 - float(sigmas[-1]), 1e-8)
         else:
             logging.info(f"[{WHO}] hybrid: steps {k + 1}-{steps} blended over all {len(windows)} windows")
-            li_p, m_p = pack(clean_parts).to(work_dev), pack(base_parts).to(work_dev)
+            # the blend gets ComfyUI's own latent and mask (the same values as our copies, so no second copy on the
+            # GPU), and the starting noise is made in place
+            li_p = latent_image
+            m_p = denoise_mask if denoise_mask is not None else pack(base_parts).to(work_dev)
             sk = float(sigmas[k])
-            noise_w = (pack(st).to(work_dev) - (1.0 - sk) * li_p) / (sk * nscale)
+            noise_w = pack(st).to(work_dev)          # st is freed below, so changing it in place is fine
+            tmp = li_p * (1.0 - sk)
+            noise_w -= tmp
+            del tmp
+            noise_w /= (sk * nscale)
+            # nothing reads the windows' full-length copies during the blend: free them first (kijai's PR #17993 fix)
+            for lst in (st, pins, clean_parts, base_parts):
+                lst.clear()
+            snap = fin = None
+            guess.clear()
             _free_vram()
             result = executor(guider, sigmas[k:], _pass_args(extra_args, counter["pass"]), progress(), noise_w, li_p,
                               m_p, disable_pbar)

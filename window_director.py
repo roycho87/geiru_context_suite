@@ -20,7 +20,7 @@ import torch
 CATEGORY = "Geiru Context Suite"
 WHO = "Geiru Window Director"
 DIR = "geiru_window_director"          # in ComfyUI's output folder
-ACTIONS = ["reroll", "approve", "rewind", "blend"]
+ACTIONS = ["reroll", "approve", "rewind", "blend", "replace"]
 PREVIEWS = ["this window", "all windows so far"]
 EVENT = "geiru_window_director.status"
 
@@ -228,6 +228,7 @@ def run_directed(d, api, state):
         st[mi] = start[mi].to(device=st[mi].device, dtype=st[mi].dtype)
         pins[mi] = clean_parts[mi].clone()
         done[mi].clear()
+    del start                                      # a full-length copy on the GPU: not needed once it's in st
     preview = [p.clone() for p in clean_parts]
     keys = {"key": None, "cap": None, "pass": 0}
 
@@ -256,7 +257,7 @@ def run_directed(d, api, state):
                 keys["cap"] = None if w.get("cap") is None else w["cap"].to(device=dev, dtype=dt)
             keys["pass"] = int(w.get("pass", 0))
 
-    def render(wi, reroll):
+    def render(wi, reroll, merge=None):
         t = wi + 1
         idxs = windows[wi]
         new = [[i for i in per_window[wi][mi] if i not in done[mi]] for mi in range(len(shapes))]
@@ -347,6 +348,43 @@ def run_directed(d, api, state):
                     continue
                 late[str(si)] = x                     # already just this window's latents, in system RAM
             save["late"] = late
+        if merge is not None:
+            # Replace: this pass may have re-made only part of the window. The file must still hold every frame the
+            # window owns (its tail is what the next window is pinned to), so write those from the full state.
+            own = merge["idx"]
+            full = {"idx": own, "st": [], "pins": [], "preview": [], "pass": int(merge.get("pass", counter["pass"]))}
+            for mi in range(len(shapes)):
+                if own[mi]:
+                    sl = ix(dims[mi], own[mi])
+                    full["st"].append(st[mi][sl].detach().cpu())
+                    full["pins"].append(pins[mi][sl].detach().cpu())
+                    full["preview"].append(preview[mi][sl].detach().cpu())
+                else:
+                    full["st"].append(torch.zeros(0))
+                    full["pins"].append(torch.zeros(0))
+                    full["preview"].append(torch.zeros(0))
+            for key in ("key", "cap"):
+                if key in merge:
+                    full[key] = merge[key]
+            old_late, new_late = merge.get("late") or {}, save.get("late") or {}
+            if old_late:
+                late = {}
+                for si, parts in old_late.items():
+                    if si not in new_late and any(new):
+                        continue          # no new late step for the re-made frames: drop it rather than keep the old ones
+                    row = []
+                    for mi in range(len(shapes)):
+                        if not own[mi]:
+                            row.append(torch.zeros(0))
+                            continue
+                        tmp = st[mi].detach().cpu().clone()
+                        tmp[ix(dims[mi], own[mi])] = parts[mi].to(tmp.dtype)
+                        if si in new_late and new[mi]:
+                            tmp[ix(dims[mi], new[mi])] = new_late[si][mi].to(tmp.dtype)
+                        row.append(tmp[ix(dims[mi], own[mi])].clone())
+                    late[si] = row
+                full["late"] = late
+            save = full
         p = _win_path(folder, t)
         torch.save(save, p + ".tmp")
         os.replace(p + ".tmp", p)
@@ -424,9 +462,20 @@ def run_directed(d, api, state):
         if k >= steps:
             result = pack(st).to(work_dev) / max(1.0 - float(sigmas[-1]), 1e-8)
         else:
-            li_p, m_p = pack(clean_parts).to(work_dev), pack(base_parts).to(work_dev)
+            # ComfyUI's own latent and mask (same values as our copies), starting noise made in place
+            li_p = api["latent_image"]
+            dm = api.get("denoise_mask")
+            m_p = dm if dm is not None else pack(base_parts).to(work_dev)
             sk = float(sigmas[k])
-            noise_w = (pack(st).to(work_dev) - (1.0 - sk) * li_p) / (sk * api["nscale"])
+            noise_w = pack(st).to(work_dev)          # st is freed below, so changing it in place is fine
+            tmp = li_p * (1.0 - sk)
+            noise_w -= tmp
+            del tmp
+            noise_w /= (sk * api["nscale"])
+            # nothing reads the full-length copies during the blend: free them first (kijai's PR #17993 fix).
+            # They're saved per window on disk, so Rewind / Replace / a later blend still work.
+            for lst in (st, pins, clean_parts, base_parts, preview):
+                lst.clear()
             api["free_vram"]()
             result = api["executor"](api["guider"], sigmas[k:], api["pass_args"](extra_args, keys["pass"] + 1),
                                      api["progress"](), noise_w, li_p, m_p, api["disable_pbar"])
@@ -434,6 +483,50 @@ def run_directed(d, api, state):
         _write_meta(folder, meta)
         _send(_status(meta, name, "blended"))
         return result
+
+    if action == "replace":
+        target = max(1, min(int(d.get("window", 1)), n))
+        if pending:
+            approved, pending = max(approved, pending), 0
+        if approved < n:
+            msg = f"windows made: {approved} of {n} - Replace needs every window made first (use Rewind instead)"
+            _send(_status(meta, name, msg))
+            raise RuntimeError(f"{WHO}: {msg}.")
+        if target == 1:
+            msg = "window 1 sets the keystone every later window was made with - it can't be replaced on its own"
+            _send(_status(meta, name, msg))
+            raise RuntimeError(f"{WHO}: {msg}.")
+        load_upto(n)
+        wi = target - 1
+        old = torch.load(_win_path(folder, target), map_location="cpu", weights_only=True)
+        nxt = ([set(per_window[wi + 1][mi]) for mi in range(len(shapes))] if wi + 1 < n
+               else [set() for _ in shapes])
+        redo = [[i for i in old["idx"][mi] if i not in nxt[mi]] for mi in range(len(shapes))]
+        if not redo[0]:
+            raise RuntimeError(f"{WHO}: window {target} has no frames of its own to re-make.")
+        rerolls[str(target)] = int(rerolls.get(str(target), 0)) + (1 if d.get("new_seed", True) else 0)
+        reroll = rerolls[str(target)]
+        fresh0 = unpack(ms.noise_scaling(sigmas[0], api["noise"], api["latent_image"]))
+        for mi in range(len(shapes)):
+            if redo[mi]:
+                sl = ix(dims[mi], redo[mi])
+                st[mi][sl] = fresh0[mi][sl].to(device=st[mi].device, dtype=st[mi].dtype)
+                done[mi].difference_update(redo[mi])
+        del fresh0
+        prev = torch.load(_win_path(folder, target - 1), map_location="cpu", weights_only=True)
+        keys["pass"] = int(prev.get("pass", 0))
+        del prev
+        count = int(meta.get("replaced", 0)) + 1
+        held = [len([i for i in per_window[wi][mi] if i in done[mi]]) for mi in range(len(shapes))]
+        logging.info(f"[{WHO}] '{name}': replace window {target} of {n}: re-making {[len(r) for r in redo]} latents"
+                     f", {held} held from its neighbours")
+        render(wi, reroll, merge=old)
+        meta.pop("stale", None)
+        meta.update(approved=n, pending=0, blended=False, replaced=count)
+        _write_meta(folder, meta)
+        msg = f"window {target} of {n} replaced between its neighbours - look at it, then Blend all"
+        _send(_status(meta, name, msg))
+        return made_so_far(wi)
 
     if action == "approve":
         if pending:
@@ -480,7 +573,7 @@ class GeiruWindowDirector:
     RETURN_NAMES = ("model",)
     FUNCTION = "patch"
     DESCRIPTION = ("Plug between Geiru Hybrid Windows and the sampler to build the render one window at "
-                   "a time: Approve, Run/Re-roll, Rewind to selected, then Blend all once every window is made. "
+                   "a time: Approve, Run/Re-roll, Rewind to selected, Replace selected, then Blend all once every window is made. "
                    "Use the node's buttons instead of ComfyUI's Run button (a plain Run re-rolls the current window).")
 
     @classmethod
@@ -493,10 +586,10 @@ class GeiruWindowDirector:
                                                    "output/geiru_window_director/<run_name>. A new name starts a new "
                                                    "take without losing the old one."}),
                 "rewind_to_window": ("INT", {"default": 1, "min": 1, "max": 9999,
-                                             "tooltip": "The window Rewind to selected goes back to. Hidden: set by "
-                                                        "clicking a square in the strip."}),
+                                             "tooltip": "The window Rewind to selected or Replace selected works on. "
+                                                        "Hidden: set by clicking a square in the strip."}),
                 "new_seed_on_reroll": ("BOOLEAN", {"default": False,
-                                                   "tooltip": "On: Re-roll and Rewind give the window fresh noise, so "
+                                                   "tooltip": "On: Re-roll, Rewind and Replace give the window fresh noise, so "
                                                               "it comes out different each time. Off: the same noise, so "
                                                               "it only changes if you change its prompt or the seed."}),
                 "keep_late_steps": ("BOOLEAN", {"default": False,
@@ -538,7 +631,7 @@ class GeiruWindowDirector:
                                                     "preview": preview if preview in PREVIEWS else PREVIEWS[0],
                                                     "bypass_blend": bool(bypass_blend),
                                                     "keep_late_steps": bool(keep_late_steps)}
-        print(f"[{WHO}] '{run_name}': {action}" + (f" to window {rewind_to_window}" if action == "rewind" else ""))
+        print(f"[{WHO}] '{run_name}': {action}" + (f" window {rewind_to_window}" if action in ("rewind", "replace") else ""))
         return (m,)
 
 

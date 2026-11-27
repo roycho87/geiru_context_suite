@@ -126,7 +126,7 @@ function paint(node) {
         sq.onmouseleave = hidePop;
       }
       sq.title = (run ? `window ${i}: rendering` : i <= approved ? `window ${i}: approved` : (i === pending ? `window ${i}: ready to look at` : `window ${i}: not made yet`))
-                 + (i <= made ? " · click to select it for Rewind to selected" : "");
+                 + (i <= made ? " · click to select it for Rewind or Replace" : "");
       sq.onclick = (e) => {
         e.stopPropagation();
         if (i > made) return;            // can only rewind to a window that exists
@@ -150,6 +150,7 @@ function paint(node) {
   g.approve.disabled = busy || (total && made >= total && approved >= total);
   g.reroll.disabled = busy;
   g.rewind.disabled = busy || !made || !sel || sel > made;
+  g.replace.disabled = busy || !total || made < total || sel < 2 || sel > total;   // window 1 sets the keystone
   g.blend.disabled = busy || !total || made < total;           // greyed out until every window is made
   const bypass = !!W(node, "bypass_blend")?.value;
   g.blend.textContent = bypass ? "Join all" : "Blend all";
@@ -208,6 +209,8 @@ async function press(node, action) {
     } else if (action === "rewind") {
       target = Math.max(1, Math.min(W(node, "rewind_to_window")?.value | 0, s.total));
       s.approved = Math.min(s.approved | 0, target - 1); s.pending = 0;
+    } else if (action === "replace") {
+      target = Math.max(2, Math.min(W(node, "rewind_to_window")?.value | 0, s.total));
     } else if (action === "reroll") {
       target = s.pending || Math.min((s.approved | 0) + 1, s.total);
     }
@@ -307,10 +310,11 @@ app.registerExtension({
       const approve = mk("Approve", "Keep this window and make the next one.");
       const reroll = mk("Run/Re-roll", "Make the current window again. Use this instead of ComfyUI's Run button.");
       const rewind = mk("Rewind to selected", "Click a window in the strip, then press this to go back to it and make it again. The windows after it are dropped.");
+      const replace = mk("Replace selected", "Once every window is made: click a window in the strip (2 or later), then press this to make only that window again, between its neighbours. The windows after it are kept, and so are the frames it hands to the next window.");
       const direct = mk("Direct", "Approve on a loop until every window is made, or until Stop.");
       const blend = mk("Blend all", "Once every window is made: the blended last steps over the whole video.");
       const reset = mk("Reset", "Clear this run's saved windows. Doesn't queue anything.");
-      const rows = [[approve, reroll], [rewind, direct], [blend, reset]].map((bs) => {
+      const rows = [[approve, reroll], [rewind, replace], [direct, blend], [reset]].map((bs) => {
         const row = document.createElement("div");
         row.className = "gwd-row";
         row.append(...bs);
@@ -327,10 +331,11 @@ app.registerExtension({
         getMinHeight: () => contentHeight(root) ?? 150,
       });
       dom.computeSize = (width) => [width, contentHeight(root) ?? 150];
-      this._gwd = { root, status: null, awaiting: false, directing: false, meta, strip, approve, reroll, rewind, direct, blend, reset };
+      this._gwd = { root, status: null, awaiting: false, directing: false, meta, strip, approve, reroll, rewind, replace, direct, blend, reset };
       approve.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "approve"); };
       reroll.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "reroll"); };
       rewind.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "rewind"); };
+      replace.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "replace"); };
       blend.onclick = (e) => { e.stopPropagation(); this._gwd.directing = false; press(this, "blend"); };
       direct.onclick = (e) => {
         e.stopPropagation();
